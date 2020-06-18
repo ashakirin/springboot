@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="demo-composite-service-0.0.1-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/tracing-composite-service/target/demo-composite-service-0.0.1-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

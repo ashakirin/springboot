@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="tracing-basic-service-0.0.1-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/tracing-basic-service/target/tracing-basic-service-0.0.1-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

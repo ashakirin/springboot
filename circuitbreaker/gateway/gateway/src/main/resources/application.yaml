@@ -1,0 +1,22 @@
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: foo
+          uri: http://localhost:8081
+          predicates:
+            - Path=/foo/**
+          filters:
+            - StripPrefix=0
+        - id: bar
+          uri: http://localhost:8082
+          predicates:
+            - Path=/bar/**
+          filters:
+            - StripPrefix=0

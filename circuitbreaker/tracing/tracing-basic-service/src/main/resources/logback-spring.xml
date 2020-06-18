@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!--property resource="application.yaml" /-->
+
+    <springProperty name="LOGGING_FILE" source="logging.file" defaultValue="unnamed" />
+    <springProperty name="LOGGING_PATH" source="logging.path" defaultValue="." />
+    <springProperty name="LOGGING_HISTORY" source="logging.history" defaultValue="14" />
+    <springProperty name="LOGGING_TOTALSIZE" source="logging.totalsize" defaultValue="20GB" />
+
+    <property name="logging.pattern.file" value="%d{ISO8601}\\t%-5p\\t[%thread]\\t[%X]\\t%logger\\t%msg\\t%throwable\\n"/>
+    <property name="logging.pattern.console" value="%black(%d{ISO8601}) %highlight(%-5level) [%blue(%t)] %yellow(%C{1.}): %msg%n%throwable"/>
+
+    <property name="logging.pattern.console" value="%d{HH:mm:ss} %-5p [%thread] [%X] %-40.40logger{39} %msg\\n"/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <Pattern>${logging.pattern.console}</Pattern>
+            <charset>utf8</charset>
+        </encoder>
+    </appender>
+
+    <root level="info">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+    <logger name="org.springframework.web.filter.CommonsRequestLoggingFilter">
+        <level value="DEBUG" />
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+    <logger name="org.zalando.logbook.Logbook">
+        <level value="TRACE" />
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+
+</configuration>
