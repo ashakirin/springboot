@@ -17,8 +17,6 @@ logbook:
   filter:
     enabled: true
 
-
-
 logging:
   level:
     org:

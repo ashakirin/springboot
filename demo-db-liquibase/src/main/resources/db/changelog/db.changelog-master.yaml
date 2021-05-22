@@ -1,0 +1,48 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: ashakirin
+      changes:
+        - createTable:
+            tableName: car
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: type
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: ready
+                  type: boolean
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 2
+      author: ashakirin
+      changes:
+        - insert:
+            tableName: car
+            columns:
+              - column:
+                  name: type
+                  value: type1
+              - column:
+                  name: ready
+                  value: true
+        - insert:
+            tableName: car
+            columns:
+              - column:
+                  name: type
+                  value: type2
+              - column:
+                  name: ready
+                  value: true
