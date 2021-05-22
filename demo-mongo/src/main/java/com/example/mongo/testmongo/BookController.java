@@ -4,9 +4,16 @@ import com.example.mongo.testmongo.entity.BookEntity;
 import com.example.mongo.testmongo.entity.BookRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
+
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 public class BookController {
@@ -17,13 +24,30 @@ public class BookController {
         this.bookRepository = bookRepository;
     }
 
-    @GetMapping("/book")
-    BookEntity getBook() {
-        BookEntity book = new BookEntity();
-        book.setId(1);
-        book.setName("test");
-        bookRepository.save(book);
+    @GetMapping("/books/{name}")
+    List<BookEntity> getBook(@PathVariable("name") String name) {
+        return bookRepository.findByName(name);
+    }
 
-        return bookRepository.findByName("test").get();
+    @GetMapping("/books/isbn/{isbn}")
+    List<BookEntity> getBookByISBN(@PathVariable("isbn") String isbn) {
+        return bookRepository.findByISBN(isbn);
+    }
+
+    @PostMapping("/books")
+    @ResponseStatus(HttpStatus.CREATED)
+    ResponseEntity createBook(@RequestBody BookEntity bookEntity) {
+        bookEntity.setId(UUID.randomUUID().toString());
+        bookRepository.save(bookEntity);
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setLocation(
+                MvcUriComponentsBuilder
+                        .fromMethodName(BookController.class, "createBook", bookEntity)
+                        .pathSegment(bookEntity.getId())
+                    .buildAndExpand()
+                .toUri());
+
+        return new ResponseEntity(httpHeaders, HttpStatus.CREATED);
     }
 }
