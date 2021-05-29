@@ -1,4 +1,4 @@
-package com.example.db.data;
+package com.example.db.entity;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -6,27 +6,26 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "Book")
-public class BookEntity {
+@Table(name="Author")
+public class AuthorEntity {
     @Id
     @GeneratedValue
-    private long id;
+    private int id;
 
     private String name;
 
-    public long getId() {
-        return id;
+    public AuthorEntity() {
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public AuthorEntity(final String name) {
+        this.name = name;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public int getId() {
+        return id;
     }
 }
