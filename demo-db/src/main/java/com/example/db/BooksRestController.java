@@ -1,5 +1,7 @@
-package com.example.db.demodb;
+package com.example.db;
 
+import com.example.db.demodb.Book;
+import com.example.db.demodb.BookService;
 import com.example.db.entity.AuthorEntity;
 import com.example.db.entity.AuthorRepository;
 import com.example.db.entity.BookEntity;
