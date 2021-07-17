@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.talend.microservices.patterns.basicservice.DemoBasicServiceApplicationTests
--------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.22 s - in com.talend.microservices.patterns.basicservice.DemoBasicServiceApplicationTests

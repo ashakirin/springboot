@@ -1,0 +1,12 @@
+server:
+  port: 8082
+  servlet:
+    context-path: /resource-server
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8083/auth/realms/baeldung
+          jwk-set-uri: http://localhost:8083/auth/realms/baeldung/protocol/openid-connect/certs
