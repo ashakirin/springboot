@@ -7,14 +7,14 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="service-bar" />
-        <module name="service-foo" />
         <module name="gateway" />
+        <module name="service-foo" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="gateway" target="1.8" />
-      <module name="service-bar" target="1.8" />
-      <module name="service-foo" target="1.8" />
+      <module name="gateway" target="11" />
+      <module name="service-bar" target="11" />
+      <module name="service-foo" target="11" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">

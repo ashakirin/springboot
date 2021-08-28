@@ -30,7 +30,7 @@ public class FooController {
     FooService fooService;
 
     TimeLimiterConfig tlConfig
-            = TimeLimiterConfig.custom().timeoutDuration(Duration.ofMillis(100)).build();
+            = TimeLimiterConfig.custom().timeoutDuration(Duration.ofMillis(1)).build();
 
     CircuitBreakerConfig cbConfig = new CircuitBreakerConfig.Builder()
             .failureRateThreshold(1)
@@ -78,25 +78,59 @@ public class FooController {
 //            Supplier<CompletionStage<String>> decorated = circuitBreaker.decorateSupplier(origCompletionStageSupplier);
 //            return ResponseEntity.ok(decorated.get().toCompletableFuture().get());
 
-            CircuitBreaker circuitBreaker = circuitBreakerRegistry.circuitBreaker("my");
-            ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-
-            Supplier<CompletionStage<String>> supplier = () -> CompletableFuture.supplyAsync(this::invokeRemoteBar);
-
-            Decorators.DecorateCompletionStage<String> decorated = Decorators.ofCompletionStage(supplier)
-                    .withCircuitBreaker(circuitBreaker)
-                    .withTimeLimiter(timeLimiter, scheduledExecutorService);
-
-            return ResponseEntity.ok(decorated.get().toCompletableFuture().get());
-
-//            String s = Decorators.ofSupplier(this::invokeRemoteBar)
+//            ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+//
+//            Supplier<CompletionStage<String>> supplier = () -> CompletableFuture.supplyAsync(this::invokeRemoteBar);
+//
+//            Decorators.DecorateCompletionStage<String> decorated = Decorators.ofCompletionStage(supplier)
 //                    .withCircuitBreaker(circuitBreaker)
-//                    .get();
-//            return ResponseEntity.ok(s);
+//                    .withTimeLimiter(timeLimiter, scheduledExecutorService);
+//
+//            return ResponseEntity.ok(decorated.get().toCompletableFuture().get());
+
+//            String s = timeout();
+
+//            String s = simpleCB();
+            
+            String s = timeoutAndCB();
+
+            return ResponseEntity.ok(s);
         } catch (Exception e) {
             LOGGER.error("Remote call issue: " + e.getMessage(), e);
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+
+    private String timeoutAndCB() throws ExecutionException, InterruptedException {
+        CircuitBreaker circuitBreaker = circuitBreakerRegistry.circuitBreaker("my");
+        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+        Supplier<CompletionStage<String>> supplier = () -> CompletableFuture.supplyAsync(this::invokeRemoteBar);
+
+        Supplier<CompletionStage<String>> decorated = Decorators.ofCompletionStage(supplier)
+                .withCircuitBreaker(circuitBreaker)
+                .withTimeLimiter(timeLimiter, scheduledExecutorService)
+                .decorate();
+
+        return decorated.get().toCompletableFuture().get();
+    }
+
+    private String timeout() throws ExecutionException, InterruptedException {
+            ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+            Supplier<CompletionStage<String>> supplier = () -> CompletableFuture.supplyAsync(this::invokeRemoteBar);
+
+        Supplier<CompletionStage<String>> decorated = Decorators.ofCompletionStage(supplier)
+                    .withTimeLimiter(timeLimiter, scheduledExecutorService)
+                .decorate();
+
+        return decorated.get().toCompletableFuture().get();
+    }
+
+    private String simpleCB() {
+        CircuitBreaker circuitBreaker = circuitBreakerRegistry.circuitBreaker("my");
+        String s = Decorators.ofSupplier(this::invokeRemoteBar)
+                .withCircuitBreaker(circuitBreaker)
+                .get();
+        return s;
     }
 
     public String invokeRemoteBar() {
