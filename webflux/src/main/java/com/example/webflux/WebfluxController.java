@@ -11,18 +11,17 @@ import reactor.core.publisher.Mono;
 @RestController
 public class WebfluxController {
     private static Logger logger = LoggerFactory.getLogger(WebfluxController.class);
-    WebClient client = WebClient.create("http://localhost:8082/bar");
+    WebClient client = WebClient.create("http://localhost:8080");
 
     @GetMapping("/hello")
-    public Mono<String> hello() {
-        Mono<String> response = client.get()
-                .uri("/hello")
+    public Mono<Employee> hello() {
+        Mono<Employee> response = client.get()
+                .uri("/react")
                 .retrieve()
                 .onStatus(s -> s.equals(HttpStatus.NOT_FOUND), cr -> Mono.just(new RuntimeException("Not found response")))
-                .bodyToMono(String.class);
+                .bodyToMono(Employee.class);
 
         return response
-                .map(String::toUpperCase)
                 .log("INFO");
     }
 }
