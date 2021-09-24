@@ -15,6 +15,7 @@ public class RabbitMQConfiguration {
     public static final String FIRST_QUEUE = "FirstQueue";
     public static final String SECOND_QUEUE = "SecondQueue";
     public static final String FANOUT_EXCHANGE = "fanoutExchange";
+    public static final String TOPIC_EXCHANGE = "topicExchange";
     public static final String HEADERS_EXCHANGE = "headersExchange";
     public static final String HEADERS_QUEUE = "HeadersQueue";
 
@@ -47,6 +48,11 @@ public class RabbitMQConfiguration {
     }
 
     @Bean
+    public TopicExchange topicExchangeExchange() {
+        return new TopicExchange(TOPIC_EXCHANGE);
+    }
+
+    @Bean
     public HeadersExchange headersExchange() {
         return new HeadersExchange(HEADERS_EXCHANGE);
     }
@@ -64,5 +70,15 @@ public class RabbitMQConfiguration {
     @Bean
     public Binding headersBinding(@Qualifier("headersQueue") Queue headersQueue, HeadersExchange headersExchange) {
         return BindingBuilder.bind(headersQueue).to(headersExchange).where("my-header").matches("my-value");
+    }
+
+    @Bean
+    public Binding topicBindingFirst(@Qualifier("firstQueue") Queue firstQueue, TopicExchange topicExchange) {
+        return BindingBuilder.bind(firstQueue).to(topicExchange).with("queue.*");
+    }
+
+    @Bean
+    public Binding topicBindingSecond(@Qualifier("secondQueue") Queue secondQueue, TopicExchange topicExchange) {
+        return BindingBuilder.bind(secondQueue).to(topicExchange).with("queue.*");
     }
 }

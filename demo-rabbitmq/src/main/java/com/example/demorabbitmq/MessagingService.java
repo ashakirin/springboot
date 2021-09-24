@@ -28,14 +28,15 @@ public class MessagingService {
         props.getHeaders().put("my-header", "my-value");
         Message amqpMessage = new Message(message.getBytes(StandardCharsets.UTF_8), props);
 //        rabbitTemplate.send(TEST_QUEUE, amqpMessage);
-        rabbitTemplate.send(HEADERS_EXCHANGE, "", amqpMessage);
-
-        rabbitTemplate.convertAndSend(FANOUT_EXCHANGE, "", message);
+//        rabbitTemplate.send(HEADERS_EXCHANGE, "", amqpMessage);
+//        rabbitTemplate.convertAndSend(FANOUT_EXCHANGE, "", message);
 
 //        rabbitTemplate.convertAndSend(TEST_QUEUE, message, m -> {
 //            m.getMessageProperties().getHeaders().put("my-header", "my-value");
 //            return m;
 //        });
+
+        rabbitTemplate.send(TOPIC_EXCHANGE, "queue.second", amqpMessage);
     }
 
     @RabbitListener(queues = TEST_QUEUE)

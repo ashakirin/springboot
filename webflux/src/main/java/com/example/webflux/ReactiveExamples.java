@@ -2,17 +2,22 @@ package com.example.webflux;
 
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
+import reactor.core.publisher.ConnectableFlux;
 import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Schedulers;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ReactiveExamples {
 
-    public static void main(String[] args) {
-        combiningElements();
+    public static void main(String[] args) throws InterruptedException {
+        testSubscribeOnPublishOn();
+        Thread.sleep(20000);
     }
 
     public static void collectingElements() {
@@ -82,5 +87,54 @@ public class ReactiveExamples {
                     @Override
                     public void onComplete() {}
                 });
+    }
+
+    public static void hotStreams() {
+        ConnectableFlux<Object> connectableFlux = Flux.create(fluxSink -> {
+            while (true) {
+                fluxSink.next(System.currentTimeMillis());
+            }
+        }).sample(Duration.ofSeconds(2))
+                .publish();
+
+        connectableFlux.subscribe(System.out::println);
+
+        connectableFlux.connect();
+    }
+
+    public static void concurrent() {
+        List<Integer> elements = new ArrayList<>();
+        Flux.just(1, 2, 3, 4, 5)
+                .publishOn(Schedulers.boundedElastic())
+                .log()
+                .map(i -> i * 2)
+                .delayElements(Duration.ofMillis(300))
+                .subscribeOn(Schedulers.elastic())
+                .subscribe(i -> System.out.println(i + " - " + Thread.currentThread().getName()));
+
+        Flux.just(6, 7, 8, 9, 10)
+                .publishOn(Schedulers.boundedElastic())
+                .log()
+                .map(i -> i * 2)
+                .delayElements(Duration.ofMillis(300))
+                .subscribeOn(Schedulers.elastic())
+                .subscribe(i -> System.out.println(i + " - " + Thread.currentThread().getName()));
+    }
+
+    public static void testSubscribeOnPublishOn() {
+        Consumer<Integer> consumer = s -> System.out.println(s + " : " + Thread.currentThread().getName());
+
+        Flux.range(1, 5)
+                .doOnNext(consumer)
+                .map(i -> {
+                    System.out.println("Inside map the thread is " + Thread.currentThread().getName());
+                    return i * 10;
+                })
+                .doOnNext(consumer)
+                .publishOn(Schedulers.newElastic("Second_PublishOn()_thread"))
+                .doOnNext(consumer)
+                .subscribeOn(Schedulers.newElastic("subscribeOn_thread"))
+                .subscribe();
+
     }
 }
