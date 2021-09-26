@@ -15,4 +15,9 @@ public class KafkaController {
     public void sendIntoTopic() {
         sender.send("test");
     }
+
+    @GetMapping("/sendobject")
+    public void sendObjectIntoTopic() {
+        sender.sendObject("test");
+    }
 }
