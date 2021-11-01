@@ -1,1 +1,8 @@
-{"image":"ashakirin/demo-service-qux","imageId":"sha256:150a41df0a230042b4031807a58e42f5d9ba8f8d6aa02ec9fc17cc9f34118684","imageDigest":"sha256:83144d2ab67906f55918b18657c276c9878f45bbb0e685f6fe3931205d908d34","tags":["latest"]}
+{
+  "image": "ashakirin/demo-service-qux",
+  "imageId": "sha256:150a41df0a230042b4031807a58e42f5d9ba8f8d6aa02ec9fc17cc9f34118684",
+  "imageDigest": "sha256:83144d2ab67906f55918b18657c276c9878f45bbb0e685f6fe3931205d908d34",
+  "tags": [
+    "latest"
+  ]
+}

@@ -10,8 +10,8 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 @EntityScan("com.example.mongo.testmongo.entity")
 public class TestMongoApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(TestMongoApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(TestMongoApplication.class, args);
+    }
 
 }

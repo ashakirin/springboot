@@ -24,9 +24,9 @@ public class CarService {
             e.printStackTrace();
         }
         Optional<Car> car = carRepository.findByName(name);
-        if(car == null) {
+        if (car == null) {
             throw new CarNotFoundException();
         }
         return car.get();
-     }
+    }
 }

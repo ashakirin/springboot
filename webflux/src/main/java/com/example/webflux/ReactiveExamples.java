@@ -35,7 +35,7 @@ public class ReactiveExamples {
 
         Flux.just(1, 2, 3, 4)
                 .log()
-                .map(i -> i*2)
+                .map(i -> i * 2)
                 .subscribe(elements::add);
 
         assertThat(elements).containsExactly(2, 4, 6, 8);
@@ -82,10 +82,12 @@ public class ReactiveExamples {
                     }
 
                     @Override
-                    public void onError(Throwable t) {}
+                    public void onError(Throwable t) {
+                    }
 
                     @Override
-                    public void onComplete() {}
+                    public void onComplete() {
+                    }
                 });
     }
 

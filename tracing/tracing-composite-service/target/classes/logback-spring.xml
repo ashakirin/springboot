@@ -18,7 +18,7 @@
     </root>
 
     <logger name="org.springframework.web.filter.CommonsRequestLoggingFilter">
-        <level value="DEBUG" />
+        <level value="DEBUG"/>
     </logger>
 
 </configuration>

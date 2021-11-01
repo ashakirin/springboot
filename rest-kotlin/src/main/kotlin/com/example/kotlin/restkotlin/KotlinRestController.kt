@@ -17,9 +17,10 @@ class KotlinRestController(
 
     @PostMapping("/write")
     fun createUser(@RequestBody userTO: UserTO): String {
-        var user: User = User(login=userTO.login, firstName=userTO.firstName, lastName=userTO.lastName)
+        var user: User = User(login = userTO.login, firstName = userTO.firstName, lastName = userTO.lastName)
         userRepository.save(user)
-        var article: Article = Article(title="testTitle", headline= "testHeadline", author=user, content="testContent", id=1L)
+        var article: Article =
+            Article(title = "testTitle", headline = "testHeadline", author = user, content = "testContent", id = 1L)
         articleRepository.save(article)
         return "hello"
     }

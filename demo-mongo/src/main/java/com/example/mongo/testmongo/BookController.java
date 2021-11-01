@@ -45,8 +45,8 @@ public class BookController {
                 MvcUriComponentsBuilder
                         .fromMethodName(BookController.class, "createBook", bookEntity)
                         .pathSegment(bookEntity.getId())
-                    .buildAndExpand()
-                .toUri());
+                        .buildAndExpand()
+                        .toUri());
 
         return new ResponseEntity(httpHeaders, HttpStatus.CREATED);
     }

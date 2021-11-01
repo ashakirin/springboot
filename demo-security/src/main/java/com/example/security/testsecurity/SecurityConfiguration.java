@@ -12,7 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-//    @Override
+    //    @Override
 //    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 //        PasswordEncoder encoder =
 //                PasswordEncoderFactories.createDelegatingPasswordEncoder();
@@ -35,7 +35,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .authenticated()
                 .and()
                 .oauth2Login();
-                //.oauth2Client();
-                //.httpBasic();
+        //.oauth2Client();
+        //.httpBasic();
     }
 }

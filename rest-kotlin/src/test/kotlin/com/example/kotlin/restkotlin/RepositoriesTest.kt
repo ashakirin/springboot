@@ -10,15 +10,21 @@ import javax.persistence.EntityManager
 
 @DataJpaTest
 class RepositoriesTest @Autowired constructor(
- val entityManager: EntityManager,
- val userRepository: UserRepository,
- val articleRepository: ArticleRepository) {
+    val entityManager: EntityManager,
+    val userRepository: UserRepository,
+    val articleRepository: ArticleRepository
+) {
 
 
     @Test
     fun userRepositoryTest() {
         // Arrange
-        var testUser = User(login="testLogin", firstName="testFirstName", lastName="testLastName", description="testDescription")
+        var testUser = User(
+            login = "testLogin",
+            firstName = "testFirstName",
+            lastName = "testLastName",
+            description = "testDescription"
+        )
         entityManager.persist(testUser);
 
         // Act
@@ -32,8 +38,19 @@ class RepositoriesTest @Autowired constructor(
     @Test
     fun articleRepositoryTest() {
         // Arrange
-        var testUser = User(login="testLogin", firstName="testFirstName", lastName="testLastName", description="testDescription")
-        var testArticle: Article = Article(title = "testTitle", headline = "testHeadLine", content = "testContent", author = testUser, slug = "testSlug")
+        var testUser = User(
+            login = "testLogin",
+            firstName = "testFirstName",
+            lastName = "testLastName",
+            description = "testDescription"
+        )
+        var testArticle: Article = Article(
+            title = "testTitle",
+            headline = "testHeadLine",
+            content = "testContent",
+            author = testUser,
+            slug = "testSlug"
+        )
         entityManager.persist(testArticle);
 
         // Act

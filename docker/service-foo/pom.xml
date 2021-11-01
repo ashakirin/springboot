@@ -19,7 +19,8 @@
         <fabric8.version>0.33.0</fabric8.version>
         <dockerimage.build.skip>false</dockerimage.build.skip>
         <!--docker.registry.url>docker.io/ashakirin/demo-service-foo</docker.registry.url-->
-        <docker.registry.url>eu.gcr.io/ccp-management/ce/cart-context/nightly/${project.artifactId}</docker.registry.url>
+        <docker.registry.url>eu.gcr.io/ccp-management/ce/cart-context/nightly/${project.artifactId}
+        </docker.registry.url>
 
     </properties>
 

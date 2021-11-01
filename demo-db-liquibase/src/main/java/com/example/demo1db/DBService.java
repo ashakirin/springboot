@@ -27,7 +27,7 @@ public class DBService {
 
     public List<CarDTO> findReadyCars(boolean ready) {
         return carRepository.findReady(ready).stream()
-        .map(c -> new CarDTO(c.getType(), c.ready))
-        .collect(Collectors.toList());
+                .map(c -> new CarDTO(c.getType(), c.ready))
+                .collect(Collectors.toList());
     }
 }

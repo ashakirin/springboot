@@ -91,7 +91,7 @@ public class FooController {
 //            String s = timeout();
 
 //            String s = simpleCB();
-            
+
             String s = timeoutAndCB();
 
             return ResponseEntity.ok(s);
@@ -115,11 +115,11 @@ public class FooController {
     }
 
     private String timeout() throws ExecutionException, InterruptedException {
-            ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-            Supplier<CompletionStage<String>> supplier = () -> CompletableFuture.supplyAsync(this::invokeRemoteBar);
+        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+        Supplier<CompletionStage<String>> supplier = () -> CompletableFuture.supplyAsync(this::invokeRemoteBar);
 
         Supplier<CompletionStage<String>> decorated = Decorators.ofCompletionStage(supplier)
-                    .withTimeLimiter(timeLimiter, scheduledExecutorService)
+                .withTimeLimiter(timeLimiter, scheduledExecutorService)
                 .decorate();
 
         return decorated.get().toCompletableFuture().get();

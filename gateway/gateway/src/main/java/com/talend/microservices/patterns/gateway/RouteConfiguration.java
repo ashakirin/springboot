@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RouteConfiguration {
-    @Value( "${httpbin-url}")
+    @Value("${httpbin-url}")
     private String httpbinUrl;
 
     @Bean
@@ -23,7 +23,7 @@ public class RouteConfiguration {
                         .filters(f -> f.hystrix(config -> config
                                 .setName("mycmd")
                                 .setFallbackUri("forward:/fallback")
-                ))
+                        ))
                         .uri(httpbinUrl))
                 .build();
     }

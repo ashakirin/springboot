@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class MvcLoggingApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(MvcLoggingApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(MvcLoggingApplication.class, args);
+    }
 
 }

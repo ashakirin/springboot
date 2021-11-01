@@ -17,9 +17,8 @@ import static org.apache.kafka.clients.producer.ProducerConfig.CLIENT_ID_CONFIG;
 
 /**
  * @author diego.costa on 18.02.21
- *
+ * <p>
  * Simple Kafka Stream topology to consume the order topic and only printing the messages.
- *
  **/
 public class OrderStatelessConsumer {
 

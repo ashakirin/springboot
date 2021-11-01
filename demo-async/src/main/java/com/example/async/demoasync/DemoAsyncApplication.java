@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableAsync;
 
-@SpringBootApplication(scanBasePackages= "com.example.async.demoasync")
+@SpringBootApplication(scanBasePackages = "com.example.async.demoasync")
 @EnableAsync
 public class DemoAsyncApplication {
 

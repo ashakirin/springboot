@@ -4,13 +4,13 @@ import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity
-class User (
+class User(
     var login: String,
     var firstName: String,
     var lastName: String,
     var description: String? = null,
     @Id @GeneratedValue var id: Long? = null
-        ) {
+) {
 }
 
 @Entity
@@ -22,5 +22,6 @@ class Article(
     var author: User,
     var slug: String = "slug",
     var addedAt: LocalDateTime = LocalDateTime.now(),
-    @Id @GeneratedValue var id: Long? = null) {
+    @Id @GeneratedValue var id: Long? = null
+) {
 }

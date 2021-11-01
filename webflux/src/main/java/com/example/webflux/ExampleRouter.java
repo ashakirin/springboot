@@ -11,7 +11,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 @Configuration
 public class ExampleRouter {
     @Bean
-    public RouterFunction<ServerResponse> routeExample (ExampleHandler exampleHandler) {
+    public RouterFunction<ServerResponse> routeExample(ExampleHandler exampleHandler) {
         RouterFunction<ServerResponse> route = RouterFunctions
                 .route(RequestPredicates.GET("/hello"), exampleHandler::hello);
 

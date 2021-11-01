@@ -20,14 +20,14 @@ spring:
 
 hystrix:
   command:
-   default:
-     execution:
-       isolation:
-         thread:
-           timeoutInMilliseconds: 2000
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 2000
 
-     circuitBreaker:
-       enabled: true
-       requestVolumeThreshold: 3
-       sleepWindowInMilliseconds: 10000
-       errorThresholdPercentage: 50
+      circuitBreaker:
+        enabled: true
+        requestVolumeThreshold: 3
+        sleepWindowInMilliseconds: 10000
+        errorThresholdPercentage: 50

@@ -1,5 +1,5 @@
 INSERT INTO CAR (ID, TYPE, READY)
-VALUES(10002,  'Type1', true);
+VALUES (10002, 'Type1', true);
 
 INSERT INTO CAR (ID, TYPE, READY)
-VALUES(10003,  'Type2', true);
+VALUES (10003, 'Type2', true);

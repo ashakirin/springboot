@@ -51,9 +51,11 @@ class RestControllerTest @Autowired constructor(
 
         var userTO: UserTO = UserTO(login = "test", firstName = "test", lastName = "test")
         var objectMapper = ObjectMapper()
-         mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.POST, "/write")
-             .content(ObjectMapper().writeValueAsString(userTO))
-             .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(
+            MockMvcRequestBuilders.request(HttpMethod.POST, "/write")
+                .content(ObjectMapper().writeValueAsString(userTO))
+                .contentType(MediaType.APPLICATION_JSON)
+        )
             .andExpect(MockMvcResultMatchers.status().`is`(HttpStatus.OK.value()))
             .andExpect(MockMvcResultMatchers.content().string("hello"))
     }

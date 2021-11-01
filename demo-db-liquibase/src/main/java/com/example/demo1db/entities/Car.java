@@ -7,7 +7,7 @@ import javax.persistence.Table;
 import java.util.Objects;
 
 @Entity
-@Table(name="Car")
+@Table(name = "Car")
 public class Car {
     @Id
     @GeneratedValue

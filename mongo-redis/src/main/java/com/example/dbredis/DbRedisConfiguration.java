@@ -25,12 +25,12 @@ public class DbRedisConfiguration {
     }
 
     @Bean
-    RedisTemplate< String, TestDocument> redisTemplate() {
-        final RedisTemplate< String, TestDocument > template =  new RedisTemplate< String, TestDocument>();
-        template.setConnectionFactory( redisConnectionFactory() );
-        template.setKeySerializer( new StringRedisSerializer() );
-        template.setHashValueSerializer( new GenericToStringSerializer< TestDocument >( TestDocument.class ) );
-        template.setValueSerializer( new GenericJackson2JsonRedisSerializer());
+    RedisTemplate<String, TestDocument> redisTemplate() {
+        final RedisTemplate<String, TestDocument> template = new RedisTemplate<String, TestDocument>();
+        template.setConnectionFactory(redisConnectionFactory());
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setHashValueSerializer(new GenericToStringSerializer<TestDocument>(TestDocument.class));
+        template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
         return template;
     }
 }

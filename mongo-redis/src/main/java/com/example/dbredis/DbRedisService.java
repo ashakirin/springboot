@@ -51,7 +51,7 @@ public class DbRedisService {
     }
 
     public void printFromList() {
-        while(true) {
+        while (true) {
             TestDocument testDocument = redisTemplate.boundListOps("testList").rightPop();
             if (testDocument == null) {
                 break;
