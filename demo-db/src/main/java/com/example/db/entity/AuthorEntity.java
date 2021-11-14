@@ -1,9 +1,6 @@
 package com.example.db.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "Author")
@@ -11,6 +8,9 @@ public class AuthorEntity {
     @Id
     @GeneratedValue
     private int id;
+
+    @Column(name="BOOKID")
+    private int bookId;
 
     private String name;
 
@@ -27,5 +27,13 @@ public class AuthorEntity {
 
     public int getId() {
         return id;
+    }
+
+    public int getBookId() {
+        return bookId;
+    }
+
+    public void setBookId(int bookId) {
+        this.bookId = bookId;
     }
 }

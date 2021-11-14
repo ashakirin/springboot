@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @RestController
 public class BooksRestController {
@@ -36,16 +37,25 @@ public class BooksRestController {
     public List<Book> getBooks() {
         Iterable<BookEntity> books = bookRepository.findAll();
         List<Book> result = new ArrayList<>();
-        books.forEach(e -> result.add(new Book(e.getId(), e.getName(), (e.getAuthorEntity() != null) ? e.getAuthorEntity().getName() : null)));
+        books.forEach(e -> result.add(new Book(e.getId(), e.getName(), extractAuthorNames(e.getAuthorEntities()))));
         return result;
     }
 
     @GetMapping("/book/{name}")
     public Book getBook(@PathVariable("name") final String name) {
         Optional<BookEntity> bookEntity = bookRepository.findByName(name);
+        Optional<BookEntity> bookEntity1 = bookRepository.findById(10001);
+        System.out.println(bookEntity1.get().getAuthorEntities().size());
+
         return bookEntity
-                .map(b -> new Book(b.getId(), b.getName(), (b.getAuthorEntity() != null) ? b.getAuthorEntity().getName() : null))
+                .map(b -> new Book(b.getId(), b.getName(), extractAuthorNames(b.getAuthorEntities())))
                 .orElse(null);
+    }
+
+    public List<String> extractAuthorNames(List<AuthorEntity> authorEntities) {
+        return authorEntities.stream()
+                .map(AuthorEntity::getName)
+                .collect(Collectors.toList());
     }
 
     @PostMapping("/authors")
@@ -99,6 +109,6 @@ public class BooksRestController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return Arrays.asList(new Book(1, "myBook", "myAuthor"));
+        return Arrays.asList(new Book(1, "myBook", Arrays.asList("myAuthor")));
     }
 }

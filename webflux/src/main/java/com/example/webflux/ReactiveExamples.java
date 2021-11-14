@@ -17,6 +17,7 @@ public class ReactiveExamples {
 
     public static void main(String[] args) throws InterruptedException {
         testSubscribeOnPublishOn();
+
         Thread.sleep(20000);
     }
 
@@ -76,6 +77,11 @@ public class ReactiveExamples {
                     public void onNext(Integer integer) {
                         elements.add(integer);
                         onNextAmount++;
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                         if (onNextAmount % 3 == 0) {
                             s.request(3);
                         }
@@ -105,6 +111,9 @@ public class ReactiveExamples {
     }
 
     public static void concurrent() {
+        // subscribeOn() for whole subscription
+        // publishOn() for subsequent operations
+
         List<Integer> elements = new ArrayList<>();
         Flux.just(1, 2, 3, 4, 5)
                 .publishOn(Schedulers.boundedElastic())
@@ -129,7 +138,7 @@ public class ReactiveExamples {
         Flux.range(1, 5)
                 .doOnNext(consumer)
                 .map(i -> {
-                    System.out.println("Inside map the thread is " + Thread.currentThread().getName());
+                    System.out.println("Inside map the thread is " + Thread.currentThread().getName() + ";  " + i);
                     return i * 10;
                 })
                 .doOnNext(consumer)

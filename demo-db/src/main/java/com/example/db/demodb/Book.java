@@ -1,14 +1,17 @@
 package com.example.db.demodb;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Book {
     private final int id;
     private final String name;
-    private final String author;
+    private final List<String> authors = new ArrayList<>();
 
-    public Book(int id, String name, String author) {
+    public Book(int id, String name, List<String> authors) {
         this.id = id;
         this.name = name;
-        this.author = author;
+        this.authors.addAll(authors);
     }
 
     public int getId() {
@@ -19,7 +22,7 @@ public class Book {
         return name;
     }
 
-    public String getAuthor() {
-        return author;
+    public List<String> getAuthors() {
+        return authors;
     }
 }

@@ -1,6 +1,8 @@
 package com.example.db.entity;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "Book")
@@ -11,8 +13,8 @@ public class BookEntity {
     private String name;
     private String test;
 
-    @OneToOne
-    private AuthorEntity authorEntity;
+    @OneToMany(mappedBy="bookId", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<AuthorEntity> authorEntities = new ArrayList<>();
 
     public BookEntity() {
     }
@@ -20,7 +22,7 @@ public class BookEntity {
     public BookEntity(String name, AuthorEntity authorEntity) {
         this.id = id;
         this.name = name;
-        this.authorEntity = authorEntity;
+        this.authorEntities.add(authorEntity);
     }
 
     public int getId() {
@@ -39,7 +41,7 @@ public class BookEntity {
         this.name = name;
     }
 
-    public AuthorEntity getAuthorEntity() {
-        return authorEntity;
+    public List<AuthorEntity> getAuthorEntities() {
+        return authorEntities;
     }
 }
