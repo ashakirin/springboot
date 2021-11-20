@@ -17,7 +17,8 @@ public class Car implements Serializable {
 
     }
 
-    public Car(String name, String type) {
+    public Car(Long id, String name, String type) {
+        this.id = id;
         this.name = name;
         this.type = type;
     }
