@@ -19,6 +19,7 @@
         <maven.compiler.target>13</maven.compiler.target>
         <spring.cloud.starter.sleuth.version>2.2.3.RELEASE</spring.cloud.starter.sleuth.version>
         <spring.cloud.starter.zipkin.version>2.2.3.RELEASE</spring.cloud.starter.zipkin.version>
+        <logbook.version>2.1.0</logbook.version>
     </properties>
 
     <dependencies>
@@ -58,25 +59,26 @@
             <artifactId>spring-cloud-starter-zipkin</artifactId>
             <version>${spring.cloud.starter.zipkin.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.zalando</groupId>
+            <artifactId>logbook-spring-boot-starter</artifactId>
+            <version>${logbook.version}</version>
+        </dependency>
     </dependencies>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-dependencies</artifactId>
-                <version>${spring-cloud.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <build>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>11</source>
+                    <target>11</target>
+                </configuration>
             </plugin>
         </plugins>
     </build>

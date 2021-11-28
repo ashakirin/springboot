@@ -30,10 +30,10 @@
         <appender-ref ref="CONSOLE"/>
     </logger>
 
-    <logger name="org.zalando.logbook.Logbook">
-        <level value="TRACE"/>
-        <appender-ref ref="CONSOLE"/>
-    </logger>
+<!--    <logger name="org.zalando.logbook.Logbook">-->
+<!--        <level value="TRACE"/>-->
+<!--        <appender-ref ref="CONSOLE"/>-->
+<!--    </logger>-->
 
 
 </configuration>

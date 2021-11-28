@@ -1,2 +1,6 @@
-D:\Projects\SpringBoot\psi-microservices-patterns\tracing\tracing-basic-service\src\main\java\com\talend\microservices\patterns\basicservice\DemoBasicServiceApplication.java
-D:\Projects\SpringBoot\psi-microservices-patterns\tracing\tracing-basic-service\src\main\java\com\talend\microservices\patterns\basicservice\BasicServiceController.java
+/Users/ashakirin/Projects/SpringBoot/git-repo/tracing/tracing-basic-service/src/main/java/com/talend/microservices/patterns/trace/kafka/ReceiverConfig.java
+/Users/ashakirin/Projects/SpringBoot/git-repo/tracing/tracing-basic-service/src/main/java/com/talend/microservices/patterns/trace/kafka/SenderConfig.java
+/Users/ashakirin/Projects/SpringBoot/git-repo/tracing/tracing-basic-service/src/main/java/com/talend/microservices/patterns/trace/kafka/Receiver.java
+/Users/ashakirin/Projects/SpringBoot/git-repo/tracing/tracing-basic-service/src/main/java/com/talend/microservices/patterns/trace/TracingBasicServiceApplication.java
+/Users/ashakirin/Projects/SpringBoot/git-repo/tracing/tracing-basic-service/src/main/java/com/talend/microservices/patterns/trace/kafka/Sender.java
+/Users/ashakirin/Projects/SpringBoot/git-repo/tracing/tracing-basic-service/src/main/java/com/talend/microservices/patterns/trace/BasicServiceController.java

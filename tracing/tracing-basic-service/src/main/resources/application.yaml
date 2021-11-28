@@ -5,9 +5,9 @@ spring:
   application:
     name: basic-service
   sleuth:
-    web:
-      client:
-        enabled: true
+#    web:
+#      client:
+#        enabled: true
     sampler:
       probability: 1
   zipkin:
@@ -16,8 +16,6 @@ spring:
 logbook:
   filter:
     enabled: true
-
-
 
 logging:
   level:

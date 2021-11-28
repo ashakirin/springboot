@@ -31,3 +31,15 @@ hystrix:
         requestVolumeThreshold: 3
         sleepWindowInMilliseconds: 10000
         errorThresholdPercentage: 50
+
+
+#logbook:
+#  filter:
+#    enabled: true
+
+#  logging:
+#    level:
+#      org:
+#        zalando:
+#          logbook: TRACE
+

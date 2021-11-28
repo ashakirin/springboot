@@ -12,8 +12,8 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="demo-composite-service" target="13" />
-      <module name="tracing-basic-service" target="13" />
-      <module name="tracing-composite-service" target="13" />
+      <module name="tracing-basic-service" target="11" />
+      <module name="tracing-composite-service" target="11" />
       <module name="tracing-jersey-basic-service" target="13" />
       <module name="tracing-jersey-composite-service" target="13" />
     </bytecodeTargetLevel>

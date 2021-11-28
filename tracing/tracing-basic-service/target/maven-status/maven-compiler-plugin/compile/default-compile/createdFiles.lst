@@ -1,2 +1,6 @@
-com\talend\microservices\patterns\basicservice\BasicServiceController.class
-com\talend\microservices\patterns\basicservice\DemoBasicServiceApplication.class
+com/talend/microservices/patterns/trace/kafka/SenderConfig.class
+com/talend/microservices/patterns/trace/TracingBasicServiceApplication.class
+com/talend/microservices/patterns/trace/BasicServiceController.class
+com/talend/microservices/patterns/trace/kafka/Sender.class
+com/talend/microservices/patterns/trace/kafka/Receiver.class
+com/talend/microservices/patterns/trace/kafka/ReceiverConfig.class
