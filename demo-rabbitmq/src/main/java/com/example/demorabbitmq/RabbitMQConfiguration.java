@@ -18,6 +18,7 @@ public class RabbitMQConfiguration {
     public static final String TOPIC_EXCHANGE = "topicExchange";
     public static final String HEADERS_EXCHANGE = "headersExchange";
     public static final String HEADERS_QUEUE = "HeadersQueue";
+    public static final String SI_OUT_QUEUE = "si.out.queue";
 
     @Bean
     Queue getQueue() {
@@ -40,6 +41,12 @@ public class RabbitMQConfiguration {
     @Qualifier("headersQueue")
     Queue getHeadersQueue() {
         return new Queue(HEADERS_QUEUE, false);
+    }
+
+    @Bean
+    @Qualifier("si.out.queue")
+    Queue getSIOutQueue() {
+        return new Queue(SI_OUT_QUEUE, false);
     }
 
     @Bean

@@ -45,15 +45,21 @@ public class MessagingService {
         LOGGER.info("Received headers: " + message.getMessageProperties().getHeaders());
     }
 
-    @RabbitListener(queues = FIRST_QUEUE)
-    public void consumeMessageFirstQueue(Message message) {
-        LOGGER.info("Received message in first queue: " + new String(message.getBody()));
+    @RabbitListener(queues = SI_OUT_QUEUE)
+    public void consumeSITestMessage(Message message) {
+        LOGGER.info("Received SI message: " + new String(message.getBody()));
+        LOGGER.info("Received SI headers: " + message.getMessageProperties().getHeaders());
     }
+//
+//    @RabbitListener(queues = FIRST_QUEUE)
+//    public void consumeMessageFirstQueue(Message message) {
+//        LOGGER.info("Received message in first queue: " + new String(message.getBody()));
+//    }
 
-    @RabbitListener(queues = SECOND_QUEUE)
-    public void consumeMessageSecondQueue(Message message) {
-        LOGGER.info("Received message in second queue: " + new String(message.getBody()));
-    }
+//    @RabbitListener(queues = SECOND_QUEUE)
+//    public void consumeMessageSecondQueue(Message message) {
+//        LOGGER.info("Received message in second queue: " + new String(message.getBody()));
+//    }
 
     @RabbitListener(queues = HEADERS_QUEUE)
     public void consumeMessageHeadersQueue(Message message) {
