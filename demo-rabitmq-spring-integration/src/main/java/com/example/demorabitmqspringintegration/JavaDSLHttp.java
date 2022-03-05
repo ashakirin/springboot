@@ -1,24 +1,27 @@
 package com.example.demorabitmqspringintegration;
 
-import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.integration.amqp.dsl.Amqp;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
+import org.springframework.integration.http.dsl.Http;
 import org.springframework.integration.transformer.ObjectToStringTransformer;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
+
 @Configuration
-public class JavaDSLAmqp {
+public class JavaDSLHttp {
 //    @Bean
-//    public IntegrationFlow amqpInbound(ConnectionFactory connectionFactory, RabbitTemplate rabbitTemplate) {
+//    public IntegrationFlow inbound() {
 //        return IntegrationFlows.from(
-//                Amqp.inboundAdapter(connectionFactory, "FirstQueue"))
-//                .transform(new ObjectToStringTransformer())
-//                .transform(s -> "SI Java DSL: " + s)
+//                        Http.inboundChannelAdapter("/test"))
+//                .handle((p, h) -> p)
+//                .transform(s -> ((String)s).getBytes(StandardCharsets.UTF_8))
 //                .log()
-//                .handle(Amqp.outboundAdapter(rabbitTemplate).routingKey("si.out.queue"))
+//                .transform(new ObjectToStringTransformer())
+//                .log()
+//                .enrichHeaders(h -> h.header("TestProperty", "testValue"))
 //                .get();
 //    }
 }

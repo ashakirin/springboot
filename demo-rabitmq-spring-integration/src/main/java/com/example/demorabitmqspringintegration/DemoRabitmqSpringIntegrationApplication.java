@@ -6,7 +6,7 @@ import org.springframework.context.annotation.ImportResource;
 import org.springframework.integration.config.EnableIntegration;
 
 @SpringBootApplication
-@EnableIntegration
+//@EnableIntegration
 //@ImportResource("classpath:spring-integration-context.xml")
 public class DemoRabitmqSpringIntegrationApplication {
 
