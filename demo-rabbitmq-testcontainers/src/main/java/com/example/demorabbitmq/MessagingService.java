@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static com.example.demorabbitmq.RabbitMQConfiguration.*;
 
@@ -17,6 +19,7 @@ import static com.example.demorabbitmq.RabbitMQConfiguration.*;
 public class MessagingService {
     Logger LOGGER = LoggerFactory.getLogger(MessagingService.class);
     private RabbitTemplate rabbitTemplate;
+    private List<String> messageList = new CopyOnWriteArrayList();
 
     @Autowired
     public MessagingService(RabbitTemplate rabbitTemplate) {
@@ -39,10 +42,11 @@ public class MessagingService {
         rabbitTemplate.send(TOPIC_EXCHANGE, "queue.second", amqpMessage);
     }
 
-    @RabbitListener(queues = TEST_QUEUE)
+    @RabbitListener(queues = FIRST_QUEUE)
     public void consumeMessage(Message message) {
         LOGGER.info("Received message: " + new String(message.getBody()));
         LOGGER.info("Received headers: " + message.getMessageProperties().getHeaders());
+        messageList.add(new String(message.getBody()));
     }
 
     @RabbitListener(queues = SI_OUT_QUEUE)
@@ -50,6 +54,11 @@ public class MessagingService {
         LOGGER.info("Received SI message: " + new String(message.getBody()));
         LOGGER.info("Received SI headers: " + message.getMessageProperties().getHeaders());
     }
+
+    public List<String> getMessageList() {
+        return messageList;
+    }
+
 //
 //    @RabbitListener(queues = FIRST_QUEUE)
 //    public void consumeMessageFirstQueue(Message message) {
