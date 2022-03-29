@@ -4,6 +4,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.annotation.Generated;
+import java.util.ArrayList;
+import java.util.List;
 
 @Document
 public class BookEntity {
@@ -13,6 +15,8 @@ public class BookEntity {
     private String name;
 
     private String isbn;
+
+    private List<AuthorEntity> authors = new ArrayList<>();
 
     public String getId() {
         return id;
@@ -36,5 +40,14 @@ public class BookEntity {
 
     public void setIsbn(String isbn) {
         this.isbn = isbn;
+    }
+
+
+    public void addAuthor(AuthorEntity authorEntity) {
+        authors.add(authorEntity);
+    }
+
+    public List<AuthorEntity> getAuthors() {
+        return authors;
     }
 }
