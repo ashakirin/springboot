@@ -1,7 +1,7 @@
 package com.example.demomoduletest;
 
-import com.example.demomoduletest.repository.BankAccount;
-import com.example.demomoduletest.repository.BankAccountRepository;
+import com.example.demomoduletest.repository1.BankAccount;
+import com.example.demomoduletest.repository1.BankAccountRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

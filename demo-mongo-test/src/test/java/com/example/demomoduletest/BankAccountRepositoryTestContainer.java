@@ -1,13 +1,14 @@
 package com.example.demomoduletest;
 
-import com.example.demomoduletest.repository.BankAccount;
-import com.example.demomoduletest.repository.BankAccountRepository;
+import com.example.demomoduletest.repository1.BankAccount;
+import com.example.demomoduletest.repository1.BankAccountRepository;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -22,6 +23,7 @@ import static org.assertj.core.api.Assertions.fail;
 
 @ExtendWith(SpringExtension.class)
 @DataMongoTest
+//@Import(MongoTestDataConfig.class)
 public class BankAccountRepositoryTestContainer {
     private static GenericContainer mongoContainer;
 
@@ -33,7 +35,7 @@ public class BankAccountRepositoryTestContainer {
     @BeforeAll
     public static void setupAll() {
         mongoContainer = startDockerContainer(
-                "mongo",
+                "mongo:5.0.6",
                 List.of(27017, 27017),
                 "mongodb",
                 null);
@@ -68,6 +70,12 @@ public class BankAccountRepositoryTestContainer {
     public void shouldGetBankAccount() throws InterruptedException {
         BankAccount bankAccountRead = bankAccountRepository.findById(id1).get();
         assertThat(bankAccountRead.getAccountNumber()).isEqualTo("testAccount");
+    }
+
+    @Test
+    public void shouldFindPreloadAccount() throws InterruptedException {
+        BankAccount bankAccountRead = bankAccountRepository.findById("preloadId1").get();
+        assertThat(bankAccountRead.getAccountNumber()).isEqualTo("bankAccountTestPreload1");
     }
 
     private static GenericContainer startDockerContainer(String image,

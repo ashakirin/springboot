@@ -1,0 +1,6 @@
+[{
+  "id": "preloadId1",
+  "accountNumber":"bankAccountTestPreload1",
+  "amount": 20,
+  "_class": "com.example.demomoduletest.repository.BankAccount"
+}]

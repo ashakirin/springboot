@@ -1,6 +1,7 @@
 package com.example.mongo.testmongo.entity;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.annotation.Generated;
@@ -15,6 +16,9 @@ public class BookEntity {
     private String name;
 
     private String isbn;
+
+    @Version
+    private Long version;
 
     private List<AuthorEntity> authors = new ArrayList<>();
 
@@ -49,5 +53,13 @@ public class BookEntity {
 
     public List<AuthorEntity> getAuthors() {
         return authors;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 }

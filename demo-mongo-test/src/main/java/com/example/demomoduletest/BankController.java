@@ -1,19 +1,21 @@
 package com.example.demomoduletest;
 
-import com.example.demomoduletest.repository.BankAccount;
-import com.example.demomoduletest.repository.BankAccountRepository;
+import com.example.demomoduletest.repository1.BankAccount;
+import com.example.demomoduletest.repository1.BankAccountOwner;
+import com.example.demomoduletest.repository1.BankAccountOwnerRepository;
+import com.example.demomoduletest.repository1.BankAccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.websocket.server.PathParam;
-
 @RestController
 public class BankController {
-    private BankAccountRepository bankAccountRepository;
+    private final BankAccountRepository bankAccountRepository;
+    private final BankAccountOwnerRepository bankAccountOwnerRepository;
 
     @Autowired
-    public BankController(BankAccountRepository bankAccountRepository) {
+    public BankController(BankAccountRepository bankAccountRepository, BankAccountOwnerRepository bankAccountOwnerRepository) {
         this.bankAccountRepository = bankAccountRepository;
+        this.bankAccountOwnerRepository = bankAccountOwnerRepository;
     }
 
     @GetMapping("/account/{id}")
@@ -23,6 +25,11 @@ public class BankController {
 
     @PostMapping("/account")
     public void getBankAccount(@RequestBody BankAccount bankAccount) {
+        BankAccountOwner owner = new BankAccountOwner();
+        owner.setId("2");
+        owner.setName("TestOwner2");
+        bankAccountOwnerRepository.save(owner);
+        bankAccount.setAccountOwner(owner);
         bankAccountRepository.save(bankAccount);
     }
 }

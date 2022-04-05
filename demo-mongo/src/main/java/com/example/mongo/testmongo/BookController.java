@@ -29,6 +29,29 @@ public class BookController {
         return bookRepository.findByName(name);
     }
 
+    @GetMapping("/books/concurrent1")
+    List<BookEntity> getBook1() {
+        List<BookEntity> test1 = bookRepository.findByName("test1");
+        test1.get(0).setName(test1.get(0).getName() + " modified1");
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        bookRepository.save(test1.get(0));
+
+        return test1;
+    }
+
+    @GetMapping("/books/concurrent2")
+    List<BookEntity> getBook2() {
+        List<BookEntity> test1 = bookRepository.findByName("test1");
+        test1.get(0).setName(test1.get(0).getName() + " modified2");
+        bookRepository.save(test1.get(0));
+
+        return test1;
+    }
+
     @GetMapping("/books/isbn/{isbn}")
     List<BookEntity> getBookByISBN(@PathVariable("isbn") String isbn) {
         return bookRepository.findByISBN(isbn);
