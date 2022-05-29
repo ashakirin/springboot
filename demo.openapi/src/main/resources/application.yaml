@@ -1,0 +1,11 @@
+statusjob:
+  delay: 1000000
+
+jasypt:
+  encryptor:
+    password: salting
+
+encrypted:
+  myproperty: ENC(VWQlc3RGb5BdCbNfDsk5B4Y7uk24ZXKaQd3k+j7wmfDwQRIUpTPLOl5Qj92Yr0NkLhSIeRhodpzkUcxI2YC/PQ==)
+
+

@@ -12,6 +12,7 @@ import javax.websocket.server.PathParam;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -35,9 +36,24 @@ public class MongoLabsController {
         return mongoLabsService.findPayments(name);
     }
 
+    @GetMapping("/payments/date")
+    public @ResponseBody List<Payment> findPaymentByDate() {
+        return mongoLabsService.findPaymentsByDate(LocalDate.now());
+    }
+
     @PostMapping("/payments")
     public ResponseEntity<Payment> createPayment() throws URISyntaxException {
         String paymentId = mongoLabsService.createPayment("test", BigDecimal.TEN);
         return ResponseEntity.created(new URI(paymentId)).build();
+    }
+
+    @PutMapping("/payments/selective")
+    public void updatePaymenSelective() {
+        mongoLabsService.selectiveUpdate("625aa8e24023d84f4359c73b");
+    }
+
+    @GetMapping("/payments/between")
+    public @ResponseBody List<Payment> findPaymentBetween() {
+        return mongoLabsService.findPaymentsBetween();
     }
 }

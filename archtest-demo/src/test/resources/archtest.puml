@@ -1,0 +1,10 @@
+@startuml
+
+[Controller] <<..controller..>>
+[Service] <<..service..>>
+[Repository] <<..repository..>>
+
+[Controller] ---> [Service]
+[Service] --> [Repository]
+
+@enduml

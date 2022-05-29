@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -18,8 +19,7 @@ import org.testcontainers.containers.Network;
 import java.util.List;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @DataMongoTest
@@ -67,9 +67,20 @@ public class BankAccountRepositoryTestContainer {
     }
 
     @Test
-    public void shouldGetBankAccount() throws InterruptedException {
+    public void shouldGetBankAccount() {
         BankAccount bankAccountRead = bankAccountRepository.findById(id1).get();
         assertThat(bankAccountRead.getAccountNumber()).isEqualTo("testAccount");
+    }
+
+    @Test
+    public void shouldThrowOptimisticLockException() {
+        BankAccount bankAccountRead1 = bankAccountRepository.findById(id1).get();
+        BankAccount bankAccountRead2 = bankAccountRepository.findById(id1).get();
+        bankAccountRead2.setAccountNumber("test1");
+        bankAccountRepository.save(bankAccountRead1);
+        bankAccountRead2.setAccountNumber("test2");
+        assertThatThrownBy(() -> bankAccountRepository.save(bankAccountRead2))
+                .isInstanceOf(OptimisticLockingFailureException.class);
     }
 
     @Test

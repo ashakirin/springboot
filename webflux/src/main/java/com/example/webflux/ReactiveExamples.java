@@ -4,11 +4,15 @@ import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.publisher.ConnectableFlux;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import reactor.util.function.Tuple2;
+import reactor.util.function.Tuples;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -16,7 +20,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ReactiveExamples {
 
     public static void main(String[] args) throws InterruptedException {
-        testSubscribeOnPublishOn();
+//        testSubscribeOnPublishOn();
+        testZipVoid();
+        System.out.println("-----------------");
 
         Thread.sleep(20000);
     }
@@ -147,5 +153,65 @@ public class ReactiveExamples {
                 .subscribeOn(Schedulers.newElastic("subscribeOn_thread"))
                 .subscribe();
 
+    }
+
+//    public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+//        Mono<String> monoA = componentA.getNext();
+//        Mono<String> monoB = componentB.getNext();
+//
+//        BiFunction<String, String, Mono<Void>> fun = (String inputA, String inputB) -> {
+//
+//            exchange.getResponse()
+//                    .getHeaders().add("test-header-a", inputA);
+//            exchange.getResponse()
+//                    .getHeaders().add("test-header-b", inputB);
+//
+//            return chain.filter(exchange);
+//        };
+//        return Mono.zip(monoA, monoB, fun);
+//    }
+
+    public static void testZip() {
+        Mono<String> monoA = Mono.fromCallable(() -> {
+            Thread.sleep(100);
+            Thread.sleep(100);
+            Thread.sleep(100);
+            System.out.println("mono A");
+            return "test1";
+        }).subscribeOn(Schedulers.parallel());;
+
+        Mono<String> monoB = Mono.fromCallable(() -> {
+            System.out.println("mono B");
+            return "test2";
+        }).subscribeOn(Schedulers.parallel());
+
+        Mono<Tuple2<String, String>> zip = Mono.zip(monoA, monoB);
+        zip.map(tuple2 -> {
+            System.out.println(tuple2.getT1() + " - " + tuple2.getT2());
+            return tuple2.getT1() + " - " + tuple2.getT2();
+        }).block();
+    }
+
+    public static void testZipVoid() {
+        Mono<Void> h1 = Mono.fromRunnable(() -> {
+            System.out.println("Hello1.1");
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println("Hello1.2");
+        });
+
+        Mono<Void> h2 = Mono.fromRunnable(() -> {
+            System.out.println("Hello2");
+        });
+
+        Mono<Void> parallelH1 = h1.subscribeOn(Schedulers.parallel());
+        Mono<Void> parallelH2 = h2.subscribeOn(Schedulers.parallel());
+
+
+        Mono<Tuple2<Void, Void>> zip = Mono.zipDelayError(parallelH1, parallelH2);
+        zip.log().block();
     }
 }

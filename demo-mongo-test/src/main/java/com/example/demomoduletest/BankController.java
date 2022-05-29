@@ -24,7 +24,7 @@ public class BankController {
     }
 
     @PostMapping("/account")
-    public void getBankAccount(@RequestBody BankAccount bankAccount) {
+    public void postBankAccount(@RequestBody BankAccount bankAccount) {
         BankAccountOwner owner = new BankAccountOwner();
         owner.setId("2");
         owner.setName("TestOwner2");

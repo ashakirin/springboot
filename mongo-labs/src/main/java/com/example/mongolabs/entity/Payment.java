@@ -4,19 +4,22 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Document
 public class Payment {
     @Id
-    final private String id;
-    final private String name;
-    final private BigDecimal amount;
+    private String id;
+    private String name;
+    private BigDecimal amount;
+    private Date created;
+    private Date updated;
     private List<PaymentItem> paymentItems = new ArrayList<>();
 
-    public Payment(String id, String name, BigDecimal amount) {
-        this.id = id;
+    public Payment(String name, BigDecimal amount) {
         this.name = name;
         this.amount = amount;
     }
@@ -31,5 +34,21 @@ public class Payment {
 
     public List<PaymentItem> getPaymentItems() {
         return paymentItems;
+    }
+
+    public Date getCreated() {
+        return created;
+    }
+
+    public void setCreated(Date created) {
+        this.created = created;
+    }
+
+    public Date getUpdated() {
+        return updated;
+    }
+
+    public void setUpdated(Date updated) {
+        this.updated = updated;
     }
 }

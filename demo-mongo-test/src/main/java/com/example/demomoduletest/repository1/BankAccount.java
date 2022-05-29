@@ -3,6 +3,7 @@ package com.example.demomoduletest.repository1;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.TypeAlias;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -16,6 +17,9 @@ public class BankAccount {
     private String accountNumber;
     private String sepa;
     private int amount;
+
+    @Version
+    private long version;
 
     @DBRef
     private BankAccountOwner accountOwner;

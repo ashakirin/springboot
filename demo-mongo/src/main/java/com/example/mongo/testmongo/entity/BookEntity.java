@@ -5,7 +5,9 @@ import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.annotation.Generated;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Document
@@ -16,6 +18,10 @@ public class BookEntity {
     private String name;
 
     private String isbn;
+
+    private String libraryId;
+
+    private Date issued;
 
     @Version
     private Long version;
@@ -46,13 +52,12 @@ public class BookEntity {
         this.isbn = isbn;
     }
 
-
-    public void addAuthor(AuthorEntity authorEntity) {
-        authors.add(authorEntity);
+    public String getLibraryId() {
+        return libraryId;
     }
 
-    public List<AuthorEntity> getAuthors() {
-        return authors;
+    public void setLibraryId(String libraryId) {
+        this.libraryId = libraryId;
     }
 
     public Long getVersion() {
@@ -61,5 +66,21 @@ public class BookEntity {
 
     public void setVersion(Long version) {
         this.version = version;
+    }
+
+    public List<AuthorEntity> getAuthors() {
+        return authors;
+    }
+
+    public void setAuthors(List<AuthorEntity> authors) {
+        this.authors = authors;
+    }
+
+    public Date getIssued() {
+        return issued;
+    }
+
+    public void setIssued(Date issued) {
+        this.issued = issued;
     }
 }
