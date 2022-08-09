@@ -2,10 +2,7 @@ package com.example.db;
 
 import com.example.db.demodb.Book;
 import com.example.db.demodb.BookService;
-import com.example.db.entity.AuthorEntity;
-import com.example.db.entity.AuthorRepository;
-import com.example.db.entity.BookEntity;
-import com.example.db.entity.BookRepository;
+import com.example.db.entity.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,11 +23,14 @@ public class BooksRestController {
 
     private final BookService bookService;
 
+    private final TestInner testInner;
+
     @Autowired
-    public BooksRestController(BookRepository bookRepository, AuthorRepository authorRepository, BookService bookService) {
+    public BooksRestController(BookRepository bookRepository, AuthorRepository authorRepository, BookService bookService, TestInner testInner) {
         this.bookRepository = bookRepository;
         this.authorRepository = authorRepository;
         this.bookService = bookService;
+        this.testInner = testInner;
     }
 
     @GetMapping("/books")
