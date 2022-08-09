@@ -8,8 +8,7 @@ import com.tngtech.archunit.library.dependencies.SlicesRuleDefinition;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
-import static com.tngtech.archunit.library.GeneralCodingRules.NO_CLASSES_SHOULD_THROW_GENERIC_EXCEPTIONS;
-import static com.tngtech.archunit.library.GeneralCodingRules.NO_CLASSES_SHOULD_USE_JODATIME;
+import static com.tngtech.archunit.library.GeneralCodingRules.*;
 
 @AnalyzeClasses(packages = "com.example.archtest", importOptions = { ImportOption.DoNotIncludeTests.class, ImportOption.DoNotIncludeJars.class })
 public class ArchitectureTests {
@@ -17,7 +16,7 @@ public class ArchitectureTests {
     static ArchRule no_generic_exceptions = NO_CLASSES_SHOULD_THROW_GENERIC_EXCEPTIONS;
 
     @ArchTest
-    static ArchRule do_not_use_jodatime = NO_CLASSES_SHOULD_USE_JODATIME;
+    static ArchRule no_field_injection = NO_CLASSES_SHOULD_USE_FIELD_INJECTION;
 
     @ArchTest
     static ArchRule no_cycles = SlicesRuleDefinition.slices().matching("..archtest.(*)..").should().beFreeOfCycles();
