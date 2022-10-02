@@ -1,0 +1,5 @@
+version: "3.9"  # optional since v1.27.0
+services:
+  spring-boot-migrator-ci:
+    image: fkrueger096/spring-boot-migrator-ci
+    entrypoint: ["tail", "-f", "/dev/null"]
