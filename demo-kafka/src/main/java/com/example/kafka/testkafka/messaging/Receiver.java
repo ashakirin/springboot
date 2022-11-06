@@ -13,13 +13,13 @@ import org.springframework.stereotype.Component;
 public class Receiver {
     private Logger LOGGER = LoggerFactory.getLogger(Receiver.class);
 
-    //    @KafkaListener(topics = "test")
-//    public void listen(@Payload String payload, @Headers Map<Object, Object> headers) {
-//        LOGGER.info("Payload: " + payload);
-//    }
-//
-    @KafkaListener(topics = "testobject")
-    public void listenObject(@Payload Foo payload, @Headers Map<Object, Object> headers) {
+    @KafkaListener(topics = "test")
+    public void listen(@Payload String payload, @Headers Map<Object, Object> headers) {
         LOGGER.info("Payload: " + payload);
     }
+
+//    @KafkaListener(topics = "testobject")
+//    public void listenObject(@Payload Foo payload, @Headers Map<Object, Object> headers) {
+//        LOGGER.info("Payload: " + payload);
+//    }
 }

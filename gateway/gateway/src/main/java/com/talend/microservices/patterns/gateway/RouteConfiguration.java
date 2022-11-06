@@ -20,13 +20,13 @@ public class RouteConfiguration {
                         .path("/get")
                         .filters(f -> f.addRequestHeader("Hello", "World"))
                         .uri(httpbinUrl))
-                .route(p -> p
-                        .host("*.hystrix.com")
-                        .filters(f -> f.hystrix(config -> config
-                                .setName("mycmd")
-                                .setFallbackUri("forward:/fallback")
-                        ))
-                        .uri(httpbinUrl))
+//                .route(p -> p
+//                        .host("*.hystrix.com")
+//                        .filters(f -> f.hystrix(config -> config
+//                                .setName("mycmd")
+//                                .setFallbackUri("forward:/fallback")
+//                        ))
+//                        .uri(httpbinUrl))
                 .build();
     }
 

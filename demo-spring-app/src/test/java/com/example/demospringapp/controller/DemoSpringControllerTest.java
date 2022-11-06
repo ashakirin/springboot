@@ -1,6 +1,7 @@
 package com.example.demospringapp.controller;
 
 import com.example.demospringapp.service.DemoSpringService;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -15,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -31,8 +33,7 @@ public class DemoSpringControllerTest {
         when(demoSpringService.demoOperation("myparam")).thenReturn("test");
         mockMvc.perform(MockMvcRequestBuilders.get("/demo/myparam"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().string("test"));
+                .andExpect(MockMvcResultMatchers.content().json("""
+                {"result":"test"}"""));
     }
-
-
 }

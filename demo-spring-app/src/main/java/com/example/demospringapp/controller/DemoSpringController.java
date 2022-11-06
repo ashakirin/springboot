@@ -17,6 +17,11 @@ public class DemoSpringController implements DemoApi {
     }
 
     public ResponseEntity<String> returnDemo(@PathVariable String param) {
-        return ResponseEntity.ok(demoSpringService.demoOperation(param));
+        String result = demoSpringService.demoOperation(param);
+        return ResponseEntity.ok(String.format("""
+                {"result":"%s"
+                }""", result));
     }
+
+
 }

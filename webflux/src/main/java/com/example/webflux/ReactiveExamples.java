@@ -195,23 +195,27 @@ public class ReactiveExamples {
     public static void testZipVoid() {
         Mono<Void> h1 = Mono.fromRunnable(() -> {
             System.out.println("Hello1.1");
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            System.out.println("Hello1.2");
+            throw new RuntimeException("XXX");
         });
 
         Mono<Void> h2 = Mono.fromRunnable(() -> {
-            System.out.println("Hello2");
+            System.out.println("Hello2.2");
+//            try {
+//                Thread.sleep(1000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//            System.out.println("Hello1.2");
         });
 
         Mono<Void> parallelH1 = h1.subscribeOn(Schedulers.parallel());
         Mono<Void> parallelH2 = h2.subscribeOn(Schedulers.parallel());
 
-
-        Mono<Tuple2<Void, Void>> zip = Mono.zipDelayError(parallelH1, parallelH2);
+        Mono<Tuple2<Void, Void>> zip = Mono.zipDelayError(parallelH1, parallelH2)
+                .onErrorMap((t) -> {
+                    System.out.println("Error: " + t);
+                    return new RuntimeException("Error: " + t.getMessage(), t);
+                });
         zip.log().block();
     }
 }

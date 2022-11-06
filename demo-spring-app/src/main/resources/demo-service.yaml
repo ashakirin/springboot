@@ -60,9 +60,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Pet'
+                $ref: '#/components/schemas/Pets'
         default:
           description: unexpected error
           content:
@@ -149,6 +147,11 @@ components:
             id:
               type: integer
               format: int64
+
+    Pets:
+      type: array
+      items:
+        $ref: '#/components/schemas/Pet'
 
     NewPet:
       type: object

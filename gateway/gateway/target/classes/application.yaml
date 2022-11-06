@@ -4,20 +4,27 @@ management:
       exposure:
         include: "*"
 
+foo-url: http://localhost.org:8081
+
 spring:
   cloud:
     gateway:
+#      httpclient:
+#        proxy:
+#          host: proxyhost
+#          port: 8888
       routes:
-        - id: foo
-          uri: http://localhost:8081
-          predicates:
-            - Path=/foo/**
-          filters:
-            - StripPrefix=0
+#        - id: foo
+#          uri: ${foo-url}
+#          predicates:
+#            - Path=/foo/**
+#          filters:
+#            - StripPrefix=0
+#            - RewritePath=/(?<segment>.*), /foo/hello
         - id: bar
           uri: http://localhost:8082
           predicates:
-            - Path=/bar/**
+            - Path=/**
           filters:
             - StripPrefix=0
 

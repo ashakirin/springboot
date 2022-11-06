@@ -1,24 +1,27 @@
 package com.talend.microservices.patterns.gateway;
 
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
-import org.springframework.http.HttpStatus;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        properties = {"httpbin=http://localhost:${wiremock.server.port}"})
+        properties = {"httpbin=http://localhost:${wiremock.server.port}",
+                "foo-url=http://localhost:${wiremock.server.port}",
+        "spring.cloud.gateway.httpclient.proxy.host=",
+        "spring.cloud.gateway.httpclient.proxy.port="})
 @AutoConfigureWireMock(port = 0)
 public class RoutesTest {
     @Autowired
-    private WebTestClient webClient;
+    private WebTestClient webTestClient;
 
     @Test
     public void contextLoads() throws Exception {
@@ -32,26 +35,29 @@ public class RoutesTest {
                         .withBody("no fallback")
                         .withFixedDelay(3000)));
 
-        webClient
+        webTestClient
                 .get().uri("/get")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
                 .jsonPath("$.headers.Hello").isEqualTo("World");
+    }
 
-        webClient
-                .get().uri("/delay/3")
-                .header("Host", "www.hystrix.com")
+    @Test
+    public void feeBarTest() throws Exception {
+        //Stubs
+        stubFor(get(urlEqualTo("/foo/hello"))
+                .willReturn(aResponse()
+                        .withBody("{\"foo\":{\"Hello\":\"World\"}}")
+                        .withHeader("Content-Type", "application/json")));
+
+        webTestClient
+                .get().uri("/foo/hello")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .consumeWith(
-                        response -> assertThat(response.getResponseBody()).isEqualTo("fallback".getBytes()));
-
-//        webClient
-//                .get().uri("/delay/3")
-//                .header("Host", "www.hystrix.com")
-//                .exchange()
-//                .expectStatus().isEqualTo(HttpStatus.GATEWAY_TIMEOUT);
+                .json("""
+                {"foo":{"Hello":"World"}}
+""");
     }
 }

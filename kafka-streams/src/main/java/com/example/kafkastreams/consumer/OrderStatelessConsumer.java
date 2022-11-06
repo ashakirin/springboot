@@ -38,8 +38,8 @@ public class OrderStatelessConsumer {
 
         builder.stream(
                 topic,
-                Consumed.with(Serdes.String(), Serdes.String())
-        ).print(Printed.toSysOut());
+                Consumed.with(Serdes.String(), Serdes.String()))
+                .print(Printed.toSysOut());
 
         Properties props = new Properties();
         props.put("bootstrap.servers", "localhost:9092");

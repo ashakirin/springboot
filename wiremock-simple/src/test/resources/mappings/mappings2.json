@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/error"
+  },
+  "response": {
+    "status": 400,
+    "jsonBody": {"my_attribute": "test"},
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

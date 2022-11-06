@@ -18,7 +18,7 @@ public class WebfluxController {
         Mono<Employee> response = client.get()
                 .uri("/react")
                 .retrieve()
-                .onStatus(s -> s.equals(HttpStatus.NOT_FOUND), cr -> Mono.just(new RuntimeException("Not found response")))
+                .onStatus(s -> s.equals(HttpStatus.NOT_FOUND), cr -> Mono.error(new RuntimeException("Not found response")))
                 .bodyToMono(Employee.class);
 
         return response

@@ -12,7 +12,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="gateway" target="11" />
+      <module name="gateway" target="17" />
       <module name="service-bar" target="11" />
       <module name="service-foo" target="11" />
     </bytecodeTargetLevel>

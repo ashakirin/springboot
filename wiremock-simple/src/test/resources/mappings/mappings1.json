@@ -5,9 +5,9 @@
   },
   "response": {
     "status": 201,
-    "body": "testBody",
+    "jsonBody": {"my_attribute": "test"},
     "headers": {
-      "Content-Type": "text/plain"
+      "Content-Type": "application/json"
     }
   }
 }
