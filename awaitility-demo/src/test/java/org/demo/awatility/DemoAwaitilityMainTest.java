@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
+import static org.hamcrest.Matchers.equalTo;
 
 class DemoAwaitilityMainTest {
     private AsyncProcessing demoAwaitilityMain;
@@ -53,9 +54,6 @@ class DemoAwaitilityMainTest {
                 .ignoreException(IllegalStateException.class)
                 .with()
                 .pollInterval(Duration.ONE_HUNDRED_MILLISECONDS)
-                .until(() -> demoAwaitilityMain.getResult(forkJoinTask) > 0);
-
-        assertThat(demoAwaitilityMain.getResult(forkJoinTask)).isEqualTo(76127);
+                .until(() -> demoAwaitilityMain.getResult(forkJoinTask), equalTo(76127));
     }
-
 }
