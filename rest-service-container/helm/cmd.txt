@@ -1,0 +1,4 @@
+ helm template --values rest-service-container/values-prod.yaml hello-rest rest-service-container
+
+ minikube addons enable ingress
+ minikube tunnel
