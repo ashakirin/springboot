@@ -1,0 +1,9 @@
+# Default values for k8s-native-tutorial-app.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+datasource:
+  url: jdbc:mysql://host.minikube.internal:3306/db_example
+  username: real-user
+  password: to_be_encrypted
