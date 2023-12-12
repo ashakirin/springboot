@@ -22,6 +22,7 @@ public class ReactiveExamples {
     public static void main(String[] args) throws InterruptedException {
 //        testSubscribeOnPublishOn();
         testZipVoid();
+//        concurrent();
         System.out.println("-----------------");
 
         Thread.sleep(20000);
@@ -178,7 +179,7 @@ public class ReactiveExamples {
             Thread.sleep(100);
             System.out.println("mono A");
             return "test1";
-        }).subscribeOn(Schedulers.parallel());;
+        }).subscribeOn(Schedulers.parallel());
 
         Mono<String> monoB = Mono.fromCallable(() -> {
             System.out.println("mono B");
