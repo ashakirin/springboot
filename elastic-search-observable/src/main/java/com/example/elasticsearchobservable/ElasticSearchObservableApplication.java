@@ -18,6 +18,8 @@ public class ElasticSearchObservableApplication {
     @Autowired
     ArticleRepository repository;
 
+//    public static final ThreadLocal<Long> CORRELATION_ID = new ThreadLocal<>();
+
     @PreDestroy
     public void deleteIndex() {
         operations.indexOps(Article.class).delete();
@@ -34,6 +36,13 @@ public class ElasticSearchObservableApplication {
 
         operations.save(documents);
         operations.indexOps(Article.class).refresh();
+
+//        Hooks.enableAutomaticContextPropagation();
+//        ContextRegistry.getInstance()
+//                .registerThreadLocalAccessor("CORRELATION_ID",
+//                        CORRELATION_ID::get,
+//                        CORRELATION_ID::set,
+//                        CORRELATION_ID::remove);
     }
 
     public static void main(String[] args) {

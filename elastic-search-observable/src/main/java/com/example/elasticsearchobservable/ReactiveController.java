@@ -1,16 +1,19 @@
 package com.example.elasticsearchobservable;
 
+import com.example.elasticsearchobservable.elastic.Article;
 import com.example.elasticsearchobservable.elastic.ArticleRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.observability.DefaultSignalListener;
 import reactor.core.publisher.Mono;
+import reactor.util.Logger;
+import reactor.util.Loggers;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 @RestController
 public class ReactiveController {
-    private static final Logger logger = LoggerFactory.getLogger(ReactiveController.class);
+    private static final Logger logger = Loggers.getLogger(ReactiveController.class);
 
     private final ArticleRepository repository;
 
@@ -19,11 +22,27 @@ public class ReactiveController {
     }
 
     @GetMapping("/echo")
-    public Mono<String> getSimpleString() {
+    public Mono<Object> getSimpleString() {
         logger.info("Enter controller");
-        Mono<String> name = repository.findByName("Article 1")
-                .map(a -> a.getName());
+        Mono<Object> name = repository.findByName("Article 1")
+                .map(Article::getName)
+                .tap(() -> new DefaultSignalListener<>() {
+                    @Override
+                    public void doOnComplete() {
+                        logger.info("inside repo");
+                    }
+                })
+                .handle((result, sink) -> {
+                    logger.info("inside handle");
+                    sink.next(result);
+                })
+                .log(logger)
+                .contextCapture();
         logger.info("After elastic search call");
         return name;
     }
+
+//    private static long correlationId() {
+//        return Math.abs(ThreadLocalRandom.current().nextLong());
+//    }
 }
