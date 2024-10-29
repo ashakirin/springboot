@@ -1,0 +1,18 @@
+[
+  {"namespace": "conrad.aiven.poc.avro",
+    "type": "enum",
+    "name": "OrderState",
+    "symbols" : ["CREATED", "VALIDATED", "FAILED", "SHIPPED"]
+  },
+  {"namespace": "conrad.aiven.poc.avro",
+   "type": "record",
+   "name": "Order",
+   "fields": [
+     {"name": "id", "type": "long"},
+     {"name": "user", "type": "string"},
+     {"name": "state", "type": "OrderState"},
+     {"name": "price", "type": "double"},
+     {"name": "description", "type": ["string", "null"]}
+   ]
+  }
+]
