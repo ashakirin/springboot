@@ -36,8 +36,8 @@ public class ReactiveController {
                     logger.info("inside handle");
                     sink.next(result);
                 })
-                .log(logger)
-                .contextCapture();
+                .log(logger);
+//                .contextCapture();
         logger.info("After elastic search call");
         return name;
     }
