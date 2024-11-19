@@ -1,0 +1,22 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: ashakirin
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            tableExists:
+              tableName: books
+      changes:
+        - sql:
+            splitStatements: false
+            sql: |
+              CREATE TABLE books (
+                id SERIAL PRIMARY KEY,
+                title TEXT NOT NULL,
+                author TEXT NOT NULL,
+                search_vector TSVECTOR GENERATED ALWAYS AS (
+                  setweight(to_tsvector('english', title), 'A') ||
+                  setweight(to_tsvector('english', author), 'B')
+                ) STORED
+              );
