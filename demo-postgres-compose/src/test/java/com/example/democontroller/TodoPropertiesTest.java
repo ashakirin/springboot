@@ -9,12 +9,22 @@ import jakarta.validation.Validator;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.WebApplicationType;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.env.YamlPropertySourceLoader;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.core.env.StandardEnvironment;
+import org.springframework.core.io.ByteArrayResource;
+
+import java.io.IOException;
+import java.io.StringReader;
 
 import static com.example.democontroller.CustomAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class TodoPropertiesTest {
 
@@ -57,13 +67,27 @@ public class TodoPropertiesTest {
         @Autowired
         TodoProperties todoProperties;
 
-        @TestConfiguration
-        @EnableConfigurationProperties(TodoProperties.class)
-        static class TestConfig {}
-
         @Test
         void isValid() {
             assertThat(todoProperties.getMyProperty()).isEqualTo("test");
         }
+    }
+
+    @Test
+    void testHacks() throws IOException {
+        var props = """
+                my-property: test
+                """;
+
+        YamlPropertySourceLoader loader = new YamlPropertySourceLoader();
+        var ps = loader.load("inline", new ByteArrayResource(props.getBytes()));
+        var env = new StandardEnvironment();
+        env.getPropertySources().addFirst(ps.get(0));
+
+        var appBuilder = new SpringApplicationBuilder(TodoProperties.class)
+                .web(WebApplicationType.NONE)
+                .environment(env);
+
+        appBuilder.run();
     }
 }
