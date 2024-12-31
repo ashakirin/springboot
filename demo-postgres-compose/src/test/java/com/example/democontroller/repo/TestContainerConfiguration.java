@@ -9,7 +9,13 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 @TestConfiguration(proxyBeanMethods = false)
+//@Testcontainers
 public class TestContainerConfiguration {
+//    @Container
+//    private static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:latest");
+//    @Container
+//    private static GenericContainer<?> nginxContainer = new GenericContainer<>("nginx:latest").withExposedPorts(80);
+
     @Bean
     @ServiceConnection
     public PostgreSQLContainer<?> postgresContainer() {
@@ -19,8 +25,8 @@ public class TestContainerConfiguration {
     @Bean
     @DynamicPropertySource
     public GenericContainer<?> nginxContainer(DynamicPropertyRegistry registry) {
-        var container = new GenericContainer<>("nginx:latest").withExposedPorts(80);
-        registry.add("external-service.port", () -> container.getFirstMappedPort());
-        return container;
+        GenericContainer<?> nginxContainer = new GenericContainer<>("nginx:latest").withExposedPorts(80);
+        registry.add("external-service.port", () -> nginxContainer.getFirstMappedPort());
+        return nginxContainer;
     }
 }

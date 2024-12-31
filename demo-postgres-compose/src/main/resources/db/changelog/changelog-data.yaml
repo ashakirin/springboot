@@ -1,0 +1,56 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-books
+      author: ashakirin
+      changes:
+        - insert:
+            tableName: books
+            columns:
+              - column:
+                  name: id
+                  value: 1
+              - column:
+                  name: title
+                  value: "Test title"
+              - column:
+                  name: author
+                  value: "Harper Lee"
+
+        - insert:
+            tableName: books
+            columns:
+              - column:
+                  name: id
+                  value: 2
+              - column:
+                  name: title
+                  value: "Test title"
+              - column:
+                  name: author
+                  value: "George Orwell"
+
+        - insert:
+            tableName: books
+            columns:
+              - column:
+                  name: id
+                  value: 3
+              - column:
+                  name: title
+                  value: "Test title"
+              - column:
+                  name: author
+                  value: "Jane Austen"
+
+        - insert:
+            tableName: books
+            columns:
+              - column:
+                  name: id
+                  value: 4
+              - column:
+                  name: title
+                  value: "Test title"
+              - column:
+                  name: author
+                  value: "J.D. Salinger"
