@@ -1,0 +1,15 @@
+### Place an order
+### Returns 201 Created with Location header. The transaction also writes outbox rows for
+### the inventory listener and for RabbitMQ externalization.
+POST http://localhost:8080/orders
+Content-Type: application/json
+
+{
+  "customerEmail": "alice@example.com",
+  "productSku": "BOOK-1234",
+  "quantity": 2,
+  "totalAmount": 39.98
+}
+
+### Quick health probe
+GET http://localhost:8080/actuator/health

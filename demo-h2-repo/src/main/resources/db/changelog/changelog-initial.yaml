@@ -1,0 +1,28 @@
+databaseChangeLog:
+    - changeSet:
+        id: create-books-table
+        author: ashakirin
+        preConditions:
+        - onFail: MARK_RAN
+          not:
+            tableExists:
+              tableName: books
+        changes:
+          - createTable:
+              tableName: books
+              columns:
+                - column:
+                    name: id
+                    type: SERIAL
+                    constraints:
+                      primaryKey: true
+                - column:
+                    name: title
+                    type: TEXT
+                    constraints:
+                      nullable: true
+                - column:
+                    name: author
+                    type: TEXT
+                    constraints:
+                      nullable: true

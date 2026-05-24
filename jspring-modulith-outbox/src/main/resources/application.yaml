@@ -1,0 +1,57 @@
+spring:
+  application:
+    name: order-service
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/orders}
+    username: ${SPRING_DATASOURCE_USERNAME:orders}
+    password: ${SPRING_DATASOURCE_PASSWORD:orders}
+
+  jpa:
+    hibernate:
+      ddl-auto: update      # demo only; use Flyway/Liquibase in real projects
+    open-in-view: false
+
+  rabbitmq:
+    host: ${SPRING_RABBITMQ_HOST:localhost}
+    port: ${SPRING_RABBITMQ_PORT:5672}
+    username: ${SPRING_RABBITMQ_USERNAME:guest}
+    password: ${SPRING_RABBITMQ_PASSWORD:guest}
+
+  # ----------------------------------------------------------------
+  # Spring Modulith outbox configuration.
+  # ----------------------------------------------------------------
+  modulith:
+    events:
+      jdbc:
+        # Auto-create EVENT_PUBLICATION (and EVENT_PUBLICATION_ARCHIVE because of the archive
+        # completion mode below). Demo only — manage schema with Flyway in real projects.
+        schema-initialization:
+          enabled: true
+      # On successful listener execution, move the publication row into an archive table.
+      # Keeps the active outbox table small while preserving auditability.
+      completion-mode: archive
+      # Republishing on restart is unsafe in multi-instance deployments. We rely on the periodic
+      # FailedEventPublications.resubmit job instead.
+      republish-outstanding-events-on-restart: false
+      # Staleness monitor: a scheduled task marks publications stuck for too long as FAILED so
+      # they can be resubmitted. Disabled when all durations are zero (the default).
+      staleness:
+        published: PT2M
+        processing: PT1M
+        resubmitted: PT2M
+        check-interval: PT30S
+
+server:
+  port: 8080
+
+logging:
+  level:
+    com.example.orderservice: DEBUG
+    org.springframework.modulith: INFO
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
