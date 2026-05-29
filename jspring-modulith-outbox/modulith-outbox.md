@@ -62,75 +62,104 @@ application.
 
 The moving pieces:
 
-- `EventPublicationRegistry` — internal SPI that writes a row to the outbox when a Spring
-  `ApplicationEvent` is published, and marks it complete after the listener finishes.
+- `EventPublicationRegistry` — internal SPI that writes one row to the outbox per
+  transactional listener at publication time, transitions it to `PROCESSING` immediately
+  before the listener runs, and finalises it to `COMPLETED` or `FAILED` based on the
+  outcome.
 - `EventPublicationRepository` — pluggable storage. This project uses the JDBC adapter
   (`spring-modulith-events-jdbc`); JPA, MongoDB, and Neo4j adapters also exist.
 - `EventSerializer` — pluggable serialization of the event payload. Default is Jackson JSON.
-- `@ApplicationModuleListener` — the recommended way to subscribe. Wraps `@Async`,
-  `@TransactionalEventListener(AFTER_COMMIT)`, and `@Transactional(REQUIRES_NEW)` so each
-  listener runs after the publishing transaction commits, in its own new transaction, on a
-  separate thread.
+- `@ApplicationModuleListener` — Modulith's shortcut for in-JVM transactional listeners
+  (`@Async` + `@TransactionalEventListener(AFTER_COMMIT)` + `@Transactional(REQUIRES_NEW)`).
+  This project does not currently use it — `OrderCompleted` has only the externalization
+  listener as its in-JVM subscriber. Adding one would create a second outbox row per event,
+  tracked independently of the externalizer.
 - `@Externalized` — marks an event type for forwarding to an external broker. Spring Modulith
-  registers a synthetic listener that does the broker publish, and that synthetic listener is
+  registers a synthetic transactional listener that does the broker publish; that listener is
   itself tracked by the outbox.
 
 ### 2.1 What happens when an event is published
+
+`OrderCompleted` has exactly **one in-JVM subscriber** — the externalization listener that
+Spring Modulith synthesises from `@Externalized` and that publishes to RabbitMQ. The actual
+inventory update happens on the *consumer* side of the broker, in `InventoryListener`
+(`@RabbitListener` bound to a queue on `orders.completed`). That listener is across the broker
+boundary; it is not tracked by the order-service's outbox.
 
 ```mermaid
 sequenceDiagram
     autonumber
     participant App as OrderService
-    participant Pub as ApplicationEventPublisher
-    participant Reg as EventPublicationRegistry
-    participant DB as Postgres
-    participant Inv as InventoryUpdater (local listener)
+    participant Reg as Registry / Interceptor
+    participant DB as Postgres<br/>(orders + event_publication)
     participant Ext as Externalization listener
     participant Rabbit as RabbitMQ
+    participant Inv as InventoryListener<br/>(@RabbitListener)
 
-    Note over App,DB: Inside ONE transaction
-    App->>DB: INSERT into orders
-    App->>Pub: publishEvent(OrderCompleted)
-    Pub->>Reg: notify of subscribers
-    Reg->>DB: INSERT outbox row (listener=InventoryUpdater)
-    Reg->>DB: INSERT outbox row (listener=externalization::orders.completed)
+    Note over App,DB: One transaction
+    App->>DB: INSERT orders
+    App->>Reg: publishEvent(OrderCompleted)
+    Reg->>DB: INSERT event_publication<br/>(status=PUBLISHED)
     App->>DB: COMMIT
 
-    par Async, after commit
-        Reg->>Inv: invoke listener
-        Inv-->>Reg: success
-        Reg->>DB: mark inventory row COMPLETED (archive)
-    and
-        Reg->>Ext: invoke listener
-        Ext->>Rabbit: publish to exchange "orders.completed"
+    Note over Reg,Ext: After commit, async on TaskExecutor
+    Reg->>DB: UPDATE row PUBLISHED to PROCESSING<br/>completion_attempts++
+    Reg->>Ext: invoke listener
+    alt broker reachable
+        Ext->>Rabbit: publish to "orders.completed"
         Rabbit-->>Ext: ack
-        Ext-->>Reg: success
-        Reg->>DB: mark externalization row COMPLETED (archive)
+        Ext-->>Reg: returns ok
+        Reg->>DB: row to COMPLETED<br/>moved to archive table
+        Rabbit->>Inv: deliver message
+        Inv-->>Rabbit: ack
+    else broker unreachable / publish throws
+        Ext-->>Reg: exception
+        Reg->>DB: row to FAILED via interceptor
+        Note over Reg,DB: retry handled by<br/>OutboxHousekeeping (§2.5)
     end
 ```
 
 The two key invariants:
 
-- The outbox INSERTs are part of the business transaction. If the transaction rolls back, no
-  outbox rows exist; nothing leaks downstream.
-- Each subscriber gets its **own** row. They succeed and fail independently. A broker outage
-  does not block the inventory listener; an inventory bug does not block the broker publish.
+- **The outbox INSERT is part of the business transaction.** If the transaction rolls back, no
+  outbox row exists; nothing leaks downstream.
+- **The outbox row is owned end-to-end by Spring Modulith's interceptor**, not by application
+  code. Application code (`OrderService`, `Externalization listener`'s body) never reads or
+  writes `event_publication` directly. The interceptor sets `PROCESSING` immediately before
+  invoking the listener, and sets `COMPLETED` (success path) or `FAILED` (exception path)
+  immediately after. That's the single point where success and failure are recorded — there is
+  no other path that mutates row status during normal operation.
+
+> **Why only one outbox row?** Each *transactional listener* of the in-JVM event gets its own
+> row. In this project the only such listener is the externalizer. `InventoryListener` is a
+> RabbitMQ consumer, not a Spring transactional event listener, so it doesn't appear in
+> `event_publication` at all — its delivery is RabbitMQ's responsibility. If you added a second
+> in-JVM `@ApplicationModuleListener` for `OrderCompleted`, you would see a second row, and
+> the two would succeed or fail independently.
 
 ### 2.2 Publication lifecycle (Spring Modulith 2.0)
 
 ```mermaid
 stateDiagram-v2
-    [*] --> PUBLISHED : registry inserts row<br/>(in business TX)
-    PUBLISHED --> PROCESSING : listener picked up<br/>(completion_attempts++)
-    PROCESSING --> COMPLETED : listener returned ok
-    PROCESSING --> FAILED : listener threw
-    PUBLISHED --> FAILED : staleness monitor<br/>(stuck too long)
-    PROCESSING --> FAILED : staleness monitor<br/>(hung listener)
-    FAILED --> RESUBMITTED : FailedEventPublications.resubmit(...)
-    RESUBMITTED --> PROCESSING : listener picked up
-    RESUBMITTED --> FAILED : staleness monitor
-    COMPLETED --> [*] : archived or deleted<br/>(completion-mode)
+    [*] --> PUBLISHED : Interceptor INSERTs row<br/>inside business transaction
+    PUBLISHED --> PROCESSING : Interceptor sets PROCESSING<br/>before invoking listener<br/>completion_attempts++
+    PROCESSING --> COMPLETED : Interceptor sets COMPLETED<br/>after listener returns ok
+    PROCESSING --> FAILED : Interceptor sets FAILED<br/>after listener throws
+    PUBLISHED --> FAILED : Staleness monitor<br/>row PUBLISHED longer than<br/>staleness.published (2m)
+    PROCESSING --> FAILED : Staleness monitor<br/>row PROCESSING longer than<br/>staleness.processing (1m)<br/>typical case is JVM crash
+    FAILED --> RESUBMITTED : OutboxHousekeeping#resubmitFailed<br/>every 1 minute<br/>only if row older than minAge (1m)
+    RESUBMITTED --> PROCESSING : Interceptor sets PROCESSING<br/>before re-invoking listener<br/>completion_attempts++
+    RESUBMITTED --> FAILED : Staleness monitor<br/>row RESUBMITTED longer than<br/>staleness.resubmitted (2m)
+    COMPLETED --> [*] : Interceptor finalises row<br/>per completion-mode<br/>update or delete or archive
 ```
+
+Three actors drive the transitions, on three different cadences:
+
+| Actor | Cadence | Sets which transitions |
+|---|---|---|
+| **Interceptor** (`CompletionRegisteringAdvisor` in Modulith, wraps every transactional listener) | synchronous around each listener invocation | INSERT to `PUBLISHED`, `PUBLISHED` to `PROCESSING`, `PROCESSING` to `COMPLETED` or `FAILED`, `RESUBMITTED` to `PROCESSING`, finalisation on completion |
+| **Staleness monitor** (built into Modulith, registered when any staleness duration is non-zero) | scheduled, `staleness.check-interval` (30s here) | `PUBLISHED` to `FAILED`, `PROCESSING` to `FAILED`, `RESUBMITTED` to `FAILED` — but only when the row has been in that state longer than the matching threshold |
+| **`OutboxHousekeeping#resubmitFailed`** (your code) | scheduled, `@Scheduled(fixedDelayString = "PT1M")` | `FAILED` to `RESUBMITTED`, with `ResubmissionOptions.minAge=1m` filtering out very-recent failures |
 
 Each row tracks `status`, `completion_attempts`, `last_resubmission_date`, plus the original
 publication date and serialized event. The staleness monitor is a scheduled task (default off,
@@ -167,10 +196,12 @@ For AMQP, `target` is the exchange name and `routingKey` is the AMQP routing key
 Modulith publishes via `RabbitTemplate`; a `Jackson2JsonMessageConverter` bean (from
 `RabbitTopology` in this project) makes it serialize the event as JSON.
 
-Crucially, the externalization listener is **just another subscriber** as far as the outbox is
-concerned. Its outbox row is only marked completed after the broker has acknowledged the
-message. If RabbitMQ is unreachable, the row stays `FAILED` and is resubmitted by
-`OutboxHousekeeping`.
+From the registry's point of view the externalization listener is no different from any other
+transactional event listener. Its outbox row is only marked `COMPLETED` after the broker has
+acknowledged the message. If RabbitMQ is unreachable or the publish throws, the row is left in
+`FAILED` and is resubmitted by `OutboxHousekeeping`. If you added an `@ApplicationModuleListener`
+in the same JVM, it would get its own row and would succeed or fail completely independently of
+the externalizer.
 
 ### 2.5 Dispatch model: not a polling outbox
 
@@ -187,17 +218,18 @@ sequenceDiagram
     participant Http as HTTP thread<br/>(http-nio-8080-exec-N)
     participant Sync as TransactionSynchronization<br/>(same HTTP thread)
     participant Exec as TaskExecutor<br/>(task-N thread)
-    participant Reg as EventPublicationRegistry
+    participant Reg as Registry / Interceptor
     participant DB as Postgres
     participant Rabbit as RabbitMQ
+    participant Inv as InventoryListener<br/>(rabbit container thread)
 
     Http->>DB: INSERT orders
     Http->>Reg: publishEvent(OrderCompleted)
-    Reg->>DB: INSERT outbox rows (PUBLISHED)
+    Reg->>DB: INSERT outbox row (PUBLISHED)
     Http->>DB: COMMIT
     Note over Http,Sync: still on the HTTP thread
     Http->>Sync: afterCommit callbacks fire
-    Sync->>Exec: submit task<br/>(@Async listener body)
+    Sync->>Exec: submit task<br/>(externalizer body)
     Sync-->>Http: callback returns
     Http-->>Http: HTTP 201 returned to client
 
@@ -206,6 +238,10 @@ sequenceDiagram
     Exec->>Rabbit: convertAndSend(OrderCompleted)
     Rabbit-->>Exec: ack
     Exec->>Reg: mark COMPLETED (archive)
+
+    Note over Rabbit,Inv: separate consumer thread,<br/>independent of the outbox
+    Rabbit->>Inv: deliver message
+    Inv-->>Rabbit: ack
 ```
 
 Two key facts from this picture:
@@ -223,7 +259,7 @@ Two key facts from this picture:
 sequenceDiagram
     autonumber
     participant Exec as TaskExecutor (task-N)
-    participant Reg as EventPublicationRegistry
+    participant Reg as Registry / Interceptor
     participant DB as Postgres
     participant Rabbit as RabbitMQ
     participant Sched as Scheduled thread<br/>(OutboxHousekeeping)
@@ -237,7 +273,7 @@ sequenceDiagram
 
     Note over Sched: ≤ 1 minute later
     Sched->>Reg: FailedEventPublications.resubmit(<br/>minAge=1m)
-    Reg->>DB: UPDATE FAILED → RESUBMITTED<br/>(conditional, only one instance wins)
+    Reg->>DB: UPDATE row FAILED to RESUBMITTED<br/>conditional, only one instance wins
     Reg->>Exec: re-dispatch listener
     Exec->>Reg: claim row (status PROCESSING again)
     Exec->>Rabbit: convertAndSend(OrderCompleted)
@@ -251,7 +287,7 @@ And the **stuck-listener** case — the JVM died between `PROCESSING` and the ro
 sequenceDiagram
     autonumber
     participant ExecOld as task-N (instance A)
-    participant Reg as EventPublicationRegistry
+    participant Reg as Registry / Interceptor
     participant Stale as Staleness monitor<br/>(scheduled, every 30s)
     participant Sched as OutboxHousekeeping<br/>(scheduled, every 1m)
     participant ExecNew as task-N (instance B)
@@ -262,10 +298,10 @@ sequenceDiagram
     Note over Reg: row stuck in PROCESSING
 
     Note over Stale: ≤ 30s later
-    Stale->>Reg: scan; row PROCESSING > 1m?
-    Note over Stale: not yet; wait
-    Stale->>Reg: next scan; row PROCESSING > 1m
-    Stale->>Reg: UPDATE PROCESSING → FAILED
+    Stale->>Reg: scan finds row not yet older than 1m
+    Note over Stale: wait for next tick
+    Stale->>Reg: next scan finds row older than 1m
+    Stale->>Reg: UPDATE row PROCESSING to FAILED
 
     Note over Sched: next 1m tick
     Sched->>Reg: resubmit(minAge=1m)
@@ -300,29 +336,29 @@ flowchart LR
     subgraph order_service["order-service (Spring Boot app)"]
         direction LR
         order["order module<br/>― REST controller<br/>― Order entity (JPA)<br/>― OrderService<br/>― OrderCompleted event"]
-        inventory["inventory module<br/>― InventoryUpdater @ApplicationModuleListener"]
         events_pkg["events module<br/>― RabbitTopology<br/>― OutboxHousekeeping"]
+        inventory["inventory module<br/>― InventoryListener<br/>(@RabbitListener)"]
     end
 
     db[("Postgres<br/>orders + event_publication")]
     rabbit["RabbitMQ<br/>exchange: orders.completed"]
 
-    order -->|"publishEvent(OrderCompleted)"| inventory
-    order -->|"@Externalized → AMQP"| rabbit
-    order ---|"persists Order rows<br/>+ outbox rows"| db
-    inventory -.->|"its outbox row<br/>is marked completed in"| db
-    rabbit -.->|"externalization outbox row<br/>marked completed after publish"| db
+    order ---|"persists Order rows<br/>+ outbox row"| db
+    order -->|"publishEvent(OrderCompleted)<br/>→ externalizer"| rabbit
+    rabbit -->|"queue: inventory.orders-completed"| inventory
+    rabbit -.->|"externalizer marks<br/>outbox row COMPLETED<br/>after ack"| db
 ```
 
 | Module      | Package                                            | Role                                                       |
 |-------------|----------------------------------------------------|------------------------------------------------------------|
 | `order`     | `com.example.orderservice.order`                   | Aggregate, repository, REST endpoint, `OrderCompleted` event |
-| `inventory` | `com.example.orderservice.inventory`               | Local listener that reacts to `OrderCompleted`             |
 | `events`    | `com.example.orderservice.events`                  | RabbitMQ topology + outbox housekeeping                    |
+| `inventory` | `com.example.orderservice.inventory`               | RabbitMQ consumer that reacts to `OrderCompleted` messages |
 
-The `inventory` module never references `Order`, only the `OrderCompleted` event. That's the
-point of using events for cross-module integration: the `inventory` module compiles against the
-event contract alone.
+The `inventory` module never references `Order`, only the `OrderCompleted` event record (used
+to deserialize incoming AMQP messages). In a real system this module would live in a separate
+`inventory-service` application with its own database; it sits in the same JVM here purely so
+the demo runs as a single Compose stack.
 
 ## 4. Configuration in this project
 
@@ -378,9 +414,9 @@ A useful sanity-check whenever you reason about an outbox failure:
   (this project does, in `OutboxHousekeeping`).
 - **`republish-outstanding-events-on-restart`** is a footgun in multi-instance deployments;
   prefer the staleness monitor + scheduled resubmission.
-- **Active table growth.** The `event_publication` table is hot. Pick `delete` or `archive`
-  completion mode and purge regularly; the index `(listener_id, serialized_event)` plus the
-  `(completion_date)` index make this efficient.
+- **Active table growth.** The `event_publication` table is on the hot path of every business
+  transaction. Pick `delete` or `archive` completion mode and purge regularly so the active
+  set stays small and indexes remain effective.
 
 ## 7. References
 
