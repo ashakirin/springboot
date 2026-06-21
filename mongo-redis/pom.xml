@@ -15,7 +15,7 @@
     <description>Demo project for Spring Boot</description>
     <properties>
         <java.version>11</java.version>
-        <lettuce-core.version>6.0.5.RELEASE</lettuce-core.version>
+        <lettuce-core.version>6.5.1.RELEASE</lettuce-core.version>
     </properties>
     <dependencies>
         <dependency>
